@@ -59,6 +59,46 @@ export const useLandlordProperties = (userId: string) => {
   });
 };
 
+export interface UpdatePropertyPayload {
+  title: string;
+  description: string;
+  type: "apartment" | "house" | "condo" | "commercial" | "other";
+  address: {
+    street?: string;
+    city: string;
+    state: string;
+    zipCode?: string;
+    country: string;
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
+  };
+  pricing: {
+    monthlyRent: number;
+    securityDeposit?: number;
+    utilitiesIncluded: boolean;
+  };
+  details: {
+    bedrooms: number;
+    bathrooms: number;
+    size?: number;
+    furnished: boolean;
+    petsAllowed: boolean;
+    smokingAllowed: boolean;
+  };
+  amenities: string[];
+  media: {
+    photos?: string[]; // Existing photos to keep
+    virtualTourUrl?: string;
+  };
+  availability: {
+    status: "available" | "rented" | "pending";
+    availableFrom?: string;
+    leaseDuration?: number;
+  };
+}
+
 export const useUpdateProperty = () => {
   const queryClient = useQueryClient();
 
@@ -66,18 +106,48 @@ export const useUpdateProperty = () => {
     mutationFn: async ({
       propertyId,
       formData,
+      newPhotos,
     }: {
       propertyId: string;
-      formData: any;
+      formData: UpdatePropertyPayload;
+      newPhotos?: File[];
     }) => {
+      const submitData = new FormData();
+
+      // Append basic fields
+      submitData.append("title", formData.title);
+      submitData.append("description", formData.description);
+      submitData.append("type", formData.type);
+
+      // Append complex fields as JSON strings
+      submitData.append("address", JSON.stringify(formData.address));
+      submitData.append("pricing", JSON.stringify(formData.pricing));
+      submitData.append("details", JSON.stringify(formData.details));
+      submitData.append("amenities", JSON.stringify(formData.amenities));
+      submitData.append("media", JSON.stringify(formData.media));
+      submitData.append("availability", JSON.stringify(formData.availability));
+
+      // Append new photos if any
+      if (newPhotos && newPhotos.length > 0) {
+        newPhotos.forEach((photo) => {
+          submitData.append("photos", photo);
+        });
+      }
+
       const { data } = await api.put<Property>(
         `/properties/${propertyId}`,
-        formData,
+        submitData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["properties"] });
+      queryClient.invalidateQueries({ queryKey: ["property", variables.propertyId] });
     },
   });
 };

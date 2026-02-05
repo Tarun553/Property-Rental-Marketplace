@@ -344,7 +344,7 @@ export function ApplicationForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Any additional information you'd like to share
+                    Any additional information you&apos;d like to share
                   </FormLabel>
                   <FormControl>
                     <Textarea

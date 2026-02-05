@@ -200,9 +200,13 @@ export default function LandlordDashboard() {
                             Manage
                           </Button>
                         </Link>
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <Link
+                          href={`/dashboard/landlord/properties/${property._id}/edit`}
+                        >
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
                         <Button
                           variant="outline"
                           size="sm"
@@ -219,7 +223,7 @@ export default function LandlordDashboard() {
               <Card>
                 <CardContent className="p-12 text-center">
                   <p className="text-gray-600 mb-4">
-                    You haven't listed any properties yet.
+                    You haven&apos;t listed any properties yet.
                   </p>
                   <Link href="/properties/create">
                     <Button>

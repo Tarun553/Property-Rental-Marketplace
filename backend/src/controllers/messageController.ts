@@ -1,10 +1,76 @@
 import { Response } from "express";
 import MessageThread from "../models/Message.js";
 import { AuthRequest } from "../middleware/auth.js";
+import User from "../models/User.js";
 
-// @desc    Get all conversation threads for the current user
-// @route   GET /api/messages/threads
-// @access  Private
+// Create or get existing conversation between two users
+export const startConversation = async (req: AuthRequest, res: Response) => {
+  try {
+    const { recipientId, propertyId, message } = req.body;
+    const senderId = req.user._id;
+
+    if (!recipientId) {
+      return res.status(400).json({ message: "Recipient ID is required" });
+    }
+
+    if (senderId.toString() === recipientId) {
+      return res.status(400).json({ message: "Cannot start conversation with yourself" });
+    }
+
+    // Check if recipient exists
+    const recipient = await User.findById(recipientId);
+    if (!recipient) {
+      return res.status(404).json({ message: "Recipient not found" });
+    }
+
+    // Generate a consistent conversationId (sorted user IDs)
+    const sortedIds = [senderId.toString(), recipientId].sort();
+    const conversationId = propertyId 
+      ? `${sortedIds[0]}_${sortedIds[1]}_${propertyId}`
+      : `${sortedIds[0]}_${sortedIds[1]}`;
+
+    // Check if conversation already exists
+    let thread = await MessageThread.findOne({ conversationId });
+
+    if (!thread) {
+      // Create new thread
+      thread = await MessageThread.create({
+        conversationId,
+        participants: [senderId, recipientId],
+        relatedProperty: propertyId || undefined,
+        messages: message ? [{
+          sender: senderId,
+          content: message,
+          timestamp: new Date(),
+          read: false,
+        }] : [],
+        lastMessageAt: new Date(),
+      });
+    } else if (message) {
+      // Add initial message to existing thread
+      thread.messages.push({
+        sender: senderId,
+        content: message,
+        timestamp: new Date(),
+        read: false,
+      });
+      thread.lastMessageAt = new Date();
+      await thread.save();
+    }
+
+    // Populate and return
+    await thread.populate([
+      { path: "participants", select: "profile email" },
+      { path: "relatedProperty", select: "title address" },
+    ]);
+
+    res.status(201).json(thread);
+  } catch (error) {
+    console.error("Start conversation error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const getUserThreads = async (req: AuthRequest, res: Response) => {
   try {
     const threads = await MessageThread.find({
@@ -20,9 +86,6 @@ export const getUserThreads = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get specific conversation history
-// @route   GET /api/messages/:conversationId
-// @access  Private
 export const getConversationHistory = async (
   req: AuthRequest,
   res: Response,
@@ -45,9 +108,7 @@ export const getConversationHistory = async (
   }
 };
 
-// @desc    Mark messages as read
-// @route   PUT /api/messages/:conversationId/read
-// @access  Private
+
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {
     const thread = await MessageThread.findOne({

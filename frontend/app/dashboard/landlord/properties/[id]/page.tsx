@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useProperty } from "@/hooks/useProperties";
-import { useAuth } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Navbar } from "@/components/layout/Navbar";
 import { PropertyApplications } from "@/components/property/PropertyApplications";
@@ -111,7 +110,7 @@ function MaintenanceTab({ propertyId }: { propertyId: string }) {
 
 export default function LandlordPropertyDetailPage() {
   const params = useParams();
-  const { user } = useAuth();
+ 
   const propertyId = params.id as string;
   const { data: property, isLoading, error } = useProperty(propertyId);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -139,7 +138,7 @@ export default function LandlordPropertyDetailPage() {
               Property Not Found
             </h1>
             <p className="text-gray-600 mb-6">
-              The property you're looking for doesn't exist.
+              The property you&apos;re looking for doesn&apos;t exist.
             </p>
             <Link href="/dashboard/landlord">
               <Button>Back to Dashboard</Button>
@@ -192,7 +191,7 @@ export default function LandlordPropertyDetailPage() {
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
-                        className={`relative h-20 w-20 flex-shrink-0 rounded overflow-hidden border-2 ${
+                        className={`relative h-20 w-20 shrink-0 rounded overflow-hidden border-2 ${
                           selectedImage === index
                             ? "border-blue-600"
                             : "border-transparent"
@@ -375,10 +374,12 @@ export default function LandlordPropertyDetailPage() {
                     </div>
                   )}
 
-                  <Button className="w-full" size="lg" variant="outline">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Property
-                  </Button>
+                  <Link href={`/dashboard/landlord/properties/${propertyId}/edit`}>
+                    <Button className="w-full" size="lg" variant="outline">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Property
+                    </Button>
+                  </Link>
 
                   {property.media.virtualTourUrl && (
                     <a

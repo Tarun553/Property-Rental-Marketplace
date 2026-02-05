@@ -5,9 +5,6 @@ import { leaseCreateSchema, leaseSignSchema } from "../validators/lease.js";
 import { AuthRequest } from "../middleware/auth.js";
 import { LeaseStatus, UserRole } from "../types/index.js";
 
-// @desc    Create lease
-// @route   POST /api/leases
-// @access  Private/Landlord
 export const createLease = async (req: AuthRequest, res: Response) => {
   try {
     const validation = leaseCreateSchema.safeParse(req.body);
@@ -39,9 +36,6 @@ export const createLease = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get lease details
-// @route   GET /api/leases/:id
-// @access  Private (Landlord/Tenant)
 export const getLeaseById = async (req: AuthRequest, res: Response) => {
   try {
     const lease = await Lease.findById(req.params.id)
@@ -69,9 +63,6 @@ export const getLeaseById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Sign lease
-// @route   PUT /api/leases/:id/sign
-// @access  Private (Landlord/Tenant)
 export const signLease = async (req: AuthRequest, res: Response) => {
   try {
     const validation = leaseSignSchema.safeParse(req.body);
@@ -127,9 +118,6 @@ export const signLease = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get property leases
-// @route   GET /api/leases/property/:propertyId
-// @access  Private/Landlord
 export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
   try {
     const property = await Property.findById(req.params.propertyId);
@@ -151,16 +139,10 @@ export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get tenant leases
-// @route   GET /api/leases/tenant/:tenantId
-// @access  Private/Tenant
 export const getTenantLeases = async (req: AuthRequest, res: Response) => {
   try {
-    // Only allow tenants to view their own leases or admins
-    if (
-      req.user._id.toString() !== req.params.tenantId &&
-      req.user.role !== UserRole.ADMIN
-    ) {
+    // Only allow tenants to view their own leases
+    if (req.user._id.toString() !== req.params.tenantId) {
       return res.status(403).json({ message: "Not authorized" });
     }
 

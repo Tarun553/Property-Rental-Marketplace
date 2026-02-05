@@ -9,7 +9,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Home, Building2 } from "lucide-react";
+import {
+  User,
+  LogOut,
+  Home,
+  Building2,
+  MessageSquare,
+  Star,
+} from "lucide-react";
 
 export function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -32,6 +39,25 @@ export function Navbar() {
           >
             Browse Properties
           </Link>
+
+          {isAuthenticated && (
+            <>
+              <Link
+                href="/messages"
+                className="text-gray-700 hover:text-blue-600 transition flex items-center gap-1"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Messages
+              </Link>
+              <Link
+                href="/reviews"
+                className="text-gray-700 hover:text-blue-600 transition flex items-center gap-1"
+              >
+                <Star className="h-4 w-4" />
+                Reviews
+              </Link>
+            </>
+          )}
 
           {isAuthenticated ? (
             <DropdownMenu>

@@ -28,9 +28,7 @@ const parseFields = (body: any) => {
   });
 };
 
-// @desc    List properties with filters
-// @route   GET /api/properties
-// @access  Public
+
 export const getProperties = async (req: Request, res: Response) => {
   try {
     const { city, minPrice, maxPrice, bedrooms, bathrooms, type } = req.query;
@@ -59,9 +57,7 @@ export const getProperties = async (req: Request, res: Response) => {
   }
 };
 
-// @desc    Get single property
-// @route   GET /api/properties/:id
-// @access  Public
+
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id).populate(
@@ -77,9 +73,7 @@ export const getPropertyById = async (req: Request, res: Response) => {
   }
 };
 
-// @desc    Create property
-// @route   POST /api/properties
-// @access  Private/Landlord
+
 export const createProperty = async (req: AuthRequest, res: Response) => {
   try {
     parseFields(req.body);
@@ -109,9 +103,7 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Update property
-// @route   PUT /api/properties/:id
-// @access  Private/Landlord
+
 export const updateProperty = async (req: AuthRequest, res: Response) => {
   try {
     parseFields(req.body);
@@ -128,17 +120,21 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
         .json({ message: "Not authorized to update this property" });
     }
 
+    // Handle photos:
+    // 1. Keep existing photos that were passed in media.photos
+    // 2. Add any new uploaded photos
+    const existingPhotosToKeep = req.body.media?.photos || [];
+    let finalPhotos = [...existingPhotosToKeep];
+
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-      const photos = await uploadMultipleToCloudinary(
+      const newPhotos = await uploadMultipleToCloudinary(
         req.files as Express.Multer.File[],
       );
-      if (!req.body.media) req.body.media = {};
-
-      // Merge with existing photos if needed, or replace.
-      // For now, let's assume replacement if media.photos is provided in body, or merge.
-      // Simplest: Replace if photos are uploaded.
-      req.body.media.photos = photos;
+      finalPhotos = [...finalPhotos, ...newPhotos];
     }
+
+    if (!req.body.media) req.body.media = {};
+    req.body.media.photos = finalPhotos;
 
     const validation = propertyUpdateSchema.safeParse(req.body);
     if (!validation.success) {
@@ -158,9 +154,7 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Delete property
-// @route   DELETE /api/properties/:id
-// @access  Private/Landlord
+
 export const deleteProperty = async (req: AuthRequest, res: Response) => {
   try {
     const property = await Property.findById(req.params.id);
@@ -183,9 +177,7 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get landlord's properties
-// @route   GET /api/properties/landlord/:userId
-// @access  Private/Landlord
+
 export const getLandlordProperties = async (
   req: AuthRequest,
   res: Response,

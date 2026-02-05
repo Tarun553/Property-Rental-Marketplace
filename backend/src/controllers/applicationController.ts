@@ -23,9 +23,7 @@ const parseFields = (body: any) => {
   });
 };
 
-// @desc    Submit application
-// @route   POST /api/applications
-// @access  Private/Tenant
+
 export const submitApplication = async (req: AuthRequest, res: Response) => {
   try {
     parseFields(req.body);
@@ -59,7 +57,7 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
       );
       documents = urls.map((url, index) => ({
         url,
-        type: "other", // Default type, can be enhanced to take from body mapping
+        type: "other", 
         name: (req.files as Express.Multer.File[])[index].originalname,
       }));
     }
@@ -79,9 +77,7 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// @desc    Get property applications
-// @route   GET /api/applications/property/:propertyId
-// @access  Private/Landlord
+
 export const getPropertyApplications = async (
   req: AuthRequest,
   res: Response,
@@ -110,9 +106,7 @@ export const getPropertyApplications = async (
   }
 };
 
-// @desc    Get tenant's applications
-// @route   GET /api/applications/tenant/:userId
-// @access  Private/Tenant
+
 export const getTenantApplications = async (
   req: AuthRequest,
   res: Response,
@@ -135,9 +129,7 @@ export const getTenantApplications = async (
   }
 };
 
-// @desc    Update application status
-// @route   PUT /api/applications/:id/status
-// @access  Private/Landlord
+
 export const updateApplicationStatus = async (
   req: AuthRequest,
   res: Response,

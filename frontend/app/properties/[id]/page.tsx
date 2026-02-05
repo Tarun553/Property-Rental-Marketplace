@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useProperty } from "@/hooks/useProperties";
@@ -29,8 +30,21 @@ import {
   X,
   Loader2,
   ArrowLeft,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+
+// Dynamically import PropertyMap to avoid SSR issues
+const PropertyMap = dynamic(
+  () =>
+    import("@/components/property/PropertyMap").then((mod) => mod.PropertyMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[400px] bg-gray-100 animate-pulse rounded-lg" />
+    ),
+  },
+);
 
 export default function PropertyDetailPage() {
   const params = useParams();
@@ -65,7 +79,7 @@ export default function PropertyDetailPage() {
             Property Not Found
           </h1>
           <p className="text-gray-600 mb-6">
-            The property you're looking for doesn't exist.
+            The property you&apos;re looking for doesn&apos;t exist.
           </p>
           <Link href="/properties">
             <Button>Browse Properties</Button>
@@ -82,6 +96,14 @@ export default function PropertyDetailPage() {
     isTenant &&
     property.availability.status === "available" &&
     !hasApplied;
+
+  const handleContactLandlord = () => {
+    const landlordId =
+      typeof property.landlord === "object"
+        ? property.landlord._id
+        : property.landlord;
+    router.push(`/messages?start=${landlordId}&property=${property._id}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -124,7 +146,7 @@ export default function PropertyDetailPage() {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`relative h-20 w-20 flex-shrink-0 rounded overflow-hidden border-2 ${
+                      className={`relative h-20 w-20 shrink-0 rounded overflow-hidden border-2 ${
                         selectedImage === index
                           ? "border-blue-600"
                           : "border-transparent"
@@ -232,6 +254,18 @@ export default function PropertyDetailPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Location Map */}
+                {property.address?.coordinates && (
+                  <div className="border-t pt-6">
+                    <h2 className="text-xl font-semibold mb-3">Location</h2>
+                    <PropertyMap
+                      properties={[property]}
+                      height="400px"
+                      zoom={15}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -328,7 +362,7 @@ export default function PropertyDetailPage() {
                       </Button>
                     </Link>
                     <p className="text-sm text-gray-600 text-center">
-                      Don't have an account?{" "}
+                      Don&apos;t have an account?{" "}
                       <Link
                         href="/register"
                         className="text-blue-600 hover:underline"
@@ -344,6 +378,19 @@ export default function PropertyDetailPage() {
                 ) : (
                   <Button className="w-full" size="lg" disabled>
                     Not Available
+                  </Button>
+                )}
+
+                {/* Contact Landlord Button - Always available for tenants */}
+                {isAuthenticated && isTenant && (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                    onClick={handleContactLandlord}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Contact Landlord
                   </Button>
                 )}
 

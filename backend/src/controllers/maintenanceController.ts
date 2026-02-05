@@ -9,9 +9,7 @@ import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { MaintenanceStatus } from "../types/index.js";
 
-// @desc    Submit maintenance request
-// @route   POST /api/maintenance
-// @access  Private/Tenant
+
 export const createMaintenanceRequest = async (
   req: AuthRequest,
   res: Response,
@@ -56,9 +54,7 @@ export const createMaintenanceRequest = async (
   }
 };
 
-// @desc    Get property maintenance requests
-// @route   GET /api/maintenance/property/:propertyId
-// @access  Private/Landlord
+
 export const getPropertyMaintenanceRequests = async (
   req: AuthRequest,
   res: Response,
@@ -85,9 +81,7 @@ export const getPropertyMaintenanceRequests = async (
   }
 };
 
-// @desc    Get tenant's maintenance requests
-// @route   GET /api/maintenance/tenant/:userId
-// @access  Private/Tenant
+
 export const getTenantMaintenanceRequests = async (
   req: AuthRequest,
   res: Response,
@@ -112,9 +106,7 @@ export const getTenantMaintenanceRequests = async (
   }
 };
 
-// @desc    Update maintenance request status
-// @route   PUT /api/maintenance/:id/status
-// @access  Private/Landlord
+
 export const updateMaintenanceStatus = async (
   req: AuthRequest,
   res: Response,
