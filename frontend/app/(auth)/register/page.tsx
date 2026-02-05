@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import {
   Card,
   CardContent,
@@ -8,9 +11,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { RegisterForm } from "@/components/components/auth/RegisterForm";
+import { RegisterForm } from "@/components/auth/RegisterForm";
 
 export default function RegisterPage() {
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading) {
+    return null; // or a loading spinner
+  }
+
+  if (isAuthenticated) {
+    return null; // Will redirect
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 py-8">
       <Card className="w-full max-w-md">

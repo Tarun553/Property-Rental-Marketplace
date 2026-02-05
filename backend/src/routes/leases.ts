@@ -4,6 +4,7 @@ import {
   getLeaseById,
   signLease,
   getPropertyLeases,
+  getTenantLeases,
 } from "../controllers/leaseController.js";
 import { protect, authorize } from "../middleware/auth.js";
 import { UserRole } from "../types/index.js";
@@ -15,6 +16,13 @@ router.post("/", protect, authorize(UserRole.LANDLORD), createLease);
 router.get("/:id", protect, getLeaseById);
 
 router.put("/:id/sign", protect, signLease);
+
+router.get(
+  "/tenant/:tenantId",
+  protect,
+  authorize(UserRole.TENANT),
+  getTenantLeases,
+);
 
 router.get(
   "/property/:propertyId",

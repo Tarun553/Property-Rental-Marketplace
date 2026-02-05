@@ -150,3 +150,27 @@ export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// @desc    Get tenant leases
+// @route   GET /api/leases/tenant/:tenantId
+// @access  Private/Tenant
+export const getTenantLeases = async (req: AuthRequest, res: Response) => {
+  try {
+    // Only allow tenants to view their own leases or admins
+    if (
+      req.user._id.toString() !== req.params.tenantId &&
+      req.user.role !== UserRole.ADMIN
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const leases = await Lease.find({ tenant: req.params.tenantId })
+      .populate("property", "title address pricing media")
+      .populate("landlord", "profile email")
+      .sort("-createdAt");
+
+    res.json(leases);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};

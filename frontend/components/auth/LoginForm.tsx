@@ -40,11 +40,13 @@ export function LoginForm() {
       return data;
     },
     onSuccess: (data) => {
-      login(data.accessToken, data.user);
+      console.log(data);
+      login(data.accessToken, data);
       toast.success("Login successful");
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Something went wrong");
+    onError: (error: unknown) => {
+      console.log(error);
+      toast.error("Something went wrong login");
     },
   });
 
