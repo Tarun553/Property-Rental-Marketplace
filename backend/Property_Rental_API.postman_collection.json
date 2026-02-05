@@ -672,6 +672,101 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"property\": \"{{propertyId}}\",\n    \"reviewee\": \"{{userId}}\",\n    \"reviewerRole\": \"tenant\",\n    \"rating\": 5,\n    \"criteria\": {\n        \"communication\": 5,\n        \"cleanliness\": 4,\n        \"responsiveness\": 5\n    },\n    \"comment\": \"Excellent stay, very helpful landlord.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews",
+              "host": ["{{base_url}}"],
+              "path": ["reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reviews/property/{{propertyId}}",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "property", "{{propertyId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reviews/user/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "user", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Respond to Review",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"response\": \"Thank you for the kind words! It was a pleasure having you as a tenant.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/reviews/{{reviewId}}/response",
+              "host": ["{{base_url}}"],
+              "path": ["reviews", "{{reviewId}}", "response"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
