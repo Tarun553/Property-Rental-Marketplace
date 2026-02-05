@@ -8,6 +8,7 @@ import {
   getLandlordProperties,
 } from "../controllers/propertyController.js";
 import { protect, authorize } from "../middleware/auth.js";
+import upload from "../middleware/upload.js";
 import { UserRole } from "../types/index.js";
 
 const router = express.Router();
@@ -15,12 +16,12 @@ const router = express.Router();
 router
   .route("/")
   .get(getProperties)
-  .post(protect, authorize(UserRole.LANDLORD), createProperty);
+  .post(protect, authorize(UserRole.LANDLORD), upload.any(), createProperty);
 
 router
   .route("/:id")
   .get(getPropertyById)
-  .put(protect, authorize(UserRole.LANDLORD), updateProperty)
+  .put(protect, authorize(UserRole.LANDLORD), upload.any(), updateProperty)
   .delete(protect, authorize(UserRole.LANDLORD), deleteProperty);
 
 router.get(

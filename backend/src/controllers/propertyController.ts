@@ -5,6 +5,28 @@ import {
   propertyUpdateSchema,
 } from "../validators/property.js";
 import { AuthRequest } from "../middleware/auth.js";
+import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
+
+// Helper to parse multipart fields
+const parseFields = (body: any) => {
+  const fields = [
+    "address",
+    "pricing",
+    "details",
+    "amenities",
+    "media",
+    "availability",
+  ];
+  fields.forEach((field) => {
+    if (typeof body[field] === "string") {
+      try {
+        body[field] = JSON.parse(body[field]);
+      } catch (e) {
+        // Leave as is if not valid JSON
+      }
+    }
+  });
+};
 
 // @desc    List properties with filters
 // @route   GET /api/properties
@@ -60,6 +82,16 @@ export const getPropertyById = async (req: Request, res: Response) => {
 // @access  Private/Landlord
 export const createProperty = async (req: AuthRequest, res: Response) => {
   try {
+    parseFields(req.body);
+
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const photos = await uploadMultipleToCloudinary(
+        req.files as Express.Multer.File[],
+      );
+      if (!req.body.media) req.body.media = {};
+      req.body.media.photos = photos;
+    }
+
     const validation = propertyCreateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -72,6 +104,7 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
 
     res.status(201).json(property);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -81,10 +114,7 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
 // @access  Private/Landlord
 export const updateProperty = async (req: AuthRequest, res: Response) => {
   try {
-    const validation = propertyUpdateSchema.safeParse(req.body);
-    if (!validation.success) {
-      return res.status(400).json({ errors: validation.error.format() });
-    }
+    parseFields(req.body);
 
     let property = await Property.findById(req.params.id);
 
@@ -98,6 +128,23 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
         .json({ message: "Not authorized to update this property" });
     }
 
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      const photos = await uploadMultipleToCloudinary(
+        req.files as Express.Multer.File[],
+      );
+      if (!req.body.media) req.body.media = {};
+
+      // Merge with existing photos if needed, or replace.
+      // For now, let's assume replacement if media.photos is provided in body, or merge.
+      // Simplest: Replace if photos are uploaded.
+      req.body.media.photos = photos;
+    }
+
+    const validation = propertyUpdateSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ errors: validation.error.format() });
+    }
+
     property = await Property.findByIdAndUpdate(
       req.params.id,
       validation.data,
@@ -106,6 +153,7 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
 
     res.json(property);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };

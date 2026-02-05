@@ -9,6 +9,7 @@ dotenv.config();
 import connectDB from "./config/database.js";
 import authRoutes from "./routes/auth.js";
 import propertyRoutes from "./routes/properties.js";
+import applicationRoutes from "./routes/applications.js";
 
 connectDB();
 
@@ -23,10 +24,22 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
+app.use("/api/applications", applicationRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "API is running..." });
 });
+
+// Error Handler
+// app.use((err: any, req: any, res: any, next: any) => {
+//   console.error(err);
+//   if (err.name === "MulterError") {
+//     return res
+//       .status(400)
+//       .json({ message: `Multer Error: ${err.message}`, field: err.field });
+//   }
+//   res.status(500).json({ message: err.message || "Server Error" });
+// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

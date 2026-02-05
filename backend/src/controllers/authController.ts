@@ -6,7 +6,6 @@ import {
   verifyRefreshToken,
 } from "../utils/auth.js";
 import { registerSchema, loginSchema } from "../validators/auth.js";
-import { UserRole } from "../types/index.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -16,6 +15,7 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const { email, password, role, profile } = validation.data;
+    console.log(email, password, role, profile);
 
     const userExists = await User.findOne({ email });
     if (userExists) {

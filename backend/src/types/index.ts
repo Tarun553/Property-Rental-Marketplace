@@ -13,9 +13,11 @@ export enum PropertyStatus {
 
 export enum ApplicationStatus {
   PENDING = "pending",
+  REVIEWING = "reviewing",
   APPROVED = "approved",
   REJECTED = "rejected",
   WITHDRAWN = "withdrawn",
+  CANCELLED = "cancelled",
 }
 
 export enum LeaseStatus {

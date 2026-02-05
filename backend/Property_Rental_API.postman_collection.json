@@ -308,6 +308,137 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Applications",
+      "item": [
+        {
+          "name": "Submit Application",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "property",
+                  "value": "{{propertyId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "personalInfo",
+                  "value": "{\n    \"occupation\": \"Software Engineer\",\n    \"employer\": \"Tech Corp\",\n    \"annualIncome\": 120000,\n    \"moveInDate\": \"2024-03-01\"\n}",
+                  "type": "text"
+                },
+                {
+                  "key": "references",
+                  "value": "[\n    {\n        \"name\": \"Previous Landlord\",\n        \"relationship\": \"Landlord\",\n        \"phone\": \"0987654321\",\n        \"email\": \"landlord@prev.com\"\n    }\n]",
+                  "type": "text"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/applications",
+              "host": ["{{base_url}}"],
+              "path": ["applications"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Applications (Landlord)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/applications/property/{{propertyId}}",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "property", "{{propertyId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Applications (Tenant)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/applications/tenant/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "tenant", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Application Status (Landlord)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"approved\",\n    \"landlordNotes\": \"Great references, approved for move-in.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/applications/{{applicationId}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["applications", "{{applicationId}}", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
