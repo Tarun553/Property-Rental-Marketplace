@@ -18,6 +18,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, AlertCircle } from "lucide-react";
 import { CreateReviewPayload } from "@/types/review";
+import { toast } from "sonner";
 
 interface ReviewFormProps {
   onSuccess?: () => void;
@@ -52,10 +53,10 @@ export const ReviewForm = ({ onSuccess }: ReviewFormProps) => {
 
   const { register, handleSubmit, reset } = useForm();
 
-  // Filter leases that are active or signed (reviewable)
+  // Filter leases that are active or expired (reviewable)
   const reviewableLeases =
     leases?.filter(
-      (lease) => lease.status === "active" || lease.status === "signed",
+      (lease) => lease.status === "active" || lease.status === "expired",
     ) || [];
 
   const selectedLease = reviewableLeases.find(
@@ -65,15 +66,24 @@ export const ReviewForm = ({ onSuccess }: ReviewFormProps) => {
         : lease.property) === selectedPropertyId,
   );
 
+  // Determine reviewee (landlord) from the lease
+  // The lease object has the landlord populated directly
   const revieweeId =
-    selectedLease && typeof selectedLease.property === "object"
-      ? typeof selectedLease.property.landlord === "object"
-        ? selectedLease.property.landlord._id
-        : selectedLease.property.landlord
-      : "";
+    selectedLease && typeof selectedLease.landlord === "object"
+      ? selectedLease.landlord._id
+      : selectedLease?.landlord;
 
   const handleFormSubmit = async (formData: { comment?: string }) => {
-    if (!selectedPropertyId || !revieweeId || overallRating === 0) {
+    if (!selectedPropertyId) {
+      toast.error("Please select a property");
+      return;
+    }
+    if (!revieweeId) {
+      toast.error("Could not determine the landlord for this property");
+      return;
+    }
+    if (overallRating === 0) {
+      toast.error("Please select an overall rating");
       return;
     }
 

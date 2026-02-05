@@ -2,11 +2,17 @@ import { Response } from "express";
 import MessageThread from "../models/Message.js";
 import { AuthRequest } from "../middleware/auth.js";
 import User from "../models/User.js";
+import { messageStartSchema } from "../validators/message.js";
 
 // Create or get existing conversation between two users
 export const startConversation = async (req: AuthRequest, res: Response) => {
   try {
-    const { recipientId, propertyId, message } = req.body;
+    const validation = messageStartSchema.safeParse(req.body);
+    if (!validation.success) {
+      return res.status(400).json({ errors: validation.error.format() });
+    }
+
+    const { recipientId, propertyId, message } = validation.data;
     const senderId = req.user._id;
 
     if (!recipientId) {
@@ -14,7 +20,9 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
     }
 
     if (senderId.toString() === recipientId) {
-      return res.status(400).json({ message: "Cannot start conversation with yourself" });
+      return res
+        .status(400)
+        .json({ message: "Cannot start conversation with yourself" });
     }
 
     // Check if recipient exists
@@ -25,7 +33,7 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
 
     // Generate a consistent conversationId (sorted user IDs)
     const sortedIds = [senderId.toString(), recipientId].sort();
-    const conversationId = propertyId 
+    const conversationId = propertyId
       ? `${sortedIds[0]}_${sortedIds[1]}_${propertyId}`
       : `${sortedIds[0]}_${sortedIds[1]}`;
 
@@ -38,12 +46,16 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
         conversationId,
         participants: [senderId, recipientId],
         relatedProperty: propertyId || undefined,
-        messages: message ? [{
-          sender: senderId,
-          content: message,
-          timestamp: new Date(),
-          read: false,
-        }] : [],
+        messages: message
+          ? [
+              {
+                sender: senderId,
+                content: message,
+                timestamp: new Date(),
+                read: false,
+              },
+            ]
+          : [],
         lastMessageAt: new Date(),
       });
     } else if (message) {
@@ -107,7 +119,6 @@ export const getConversationHistory = async (
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {

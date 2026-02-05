@@ -19,9 +19,9 @@ interface ReviewCardProps {
   isOwnReview?: boolean;
 }
 
-export const ReviewCard = ({ 
-  review, 
-  onRespond, 
+export const ReviewCard = ({
+  review,
+  onRespond,
   isResponding,
   showProperty = true,
   isOwnReview = false,
@@ -30,7 +30,8 @@ export const ReviewCard = ({
   const [showResponseForm, setShowResponseForm] = useState(false);
   const [responseText, setResponseText] = useState("");
 
-  const canRespond = user?._id === review.reviewee && !review.response && !isOwnReview;
+  const canRespond =
+    user?._id === review.reviewee && !review.response && !isOwnReview;
 
   const handleSubmitResponse = () => {
     if (responseText.trim() && onRespond) {
@@ -63,18 +64,20 @@ export const ReviewCard = ({
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
             <Avatar>
-              <AvatarImage src={review.reviewer.profile.avatar} />
+              <AvatarImage src={review.reviewer?.profile?.avatar} />
               <AvatarFallback>
-                {review.reviewer.profile.firstName[0]}
-                {review.reviewer.profile.lastName[0]}
+                {review.reviewer?.profile?.firstName?.[0] || "?"}
+                {review.reviewer?.profile?.lastName?.[0] || "?"}
               </AvatarFallback>
             </Avatar>
             <div>
               <h4 className="font-semibold">
-                {isOwnReview ? "Your Review" : (
+                {isOwnReview ? (
+                  "Your Review"
+                ) : (
                   <>
-                    {review.reviewer.profile.firstName}{" "}
-                    {review.reviewer.profile.lastName}
+                    {review.reviewer?.profile?.firstName || "Unknown"}{" "}
+                    {review.reviewer?.profile?.lastName || "User"}
                   </>
                 )}
               </h4>
@@ -106,16 +109,15 @@ export const ReviewCard = ({
             {review.property.address && (
               <span className="text-muted-foreground">
                 {" "}
-                - {review.property.address.city}, {review.property.address.state}
+                - {review.property.address.city},{" "}
+                {review.property.address.state}
               </span>
             )}
           </div>
         )}
 
         {/* Comment */}
-        {review.comment && (
-          <p className="text-sm">{review.comment}</p>
-        )}
+        {review.comment && <p className="text-sm">{review.comment}</p>}
 
         {/* Criteria Ratings */}
         {review.criteria && Object.keys(review.criteria).length > 0 && (
@@ -125,7 +127,10 @@ export const ReviewCard = ({
               {Object.entries(review.criteria).map(([key, value]) => {
                 if (!value) return null;
                 return (
-                  <div key={key} className="flex items-center justify-between text-sm">
+                  <div
+                    key={key}
+                    className="flex items-center justify-between text-sm"
+                  >
                     <span className="text-muted-foreground capitalize">
                       {key.replace(/([A-Z])/g, " $1").trim()}:
                     </span>
@@ -149,7 +154,9 @@ export const ReviewCard = ({
                 {isOwnReview ? "Response received:" : "Response from reviewee:"}
               </p>
             </div>
-            <p className="text-sm text-muted-foreground ml-6">{review.response}</p>
+            <p className="text-sm text-muted-foreground ml-6">
+              {review.response}
+            </p>
           </div>
         )}
 

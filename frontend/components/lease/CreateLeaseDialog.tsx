@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCreateLease } from "@/hooks/useLeases";
+import { usePropertyApplications } from "@/hooks/useApplications";
+import { useProperty } from "@/hooks/useProperties";
 import {
   Dialog,
   DialogContent,
@@ -13,12 +15,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 
 const leaseSchema = z.object({
   tenant: z.string().min(1, "Tenant is required"),
@@ -47,11 +56,24 @@ export function CreateLeaseDialog({
   const [open, setOpen] = useState(false);
   const createMutation = useCreateLease();
 
+  // Fetch approved applications for this property
+  const { data: applications, isLoading: applicationsLoading } =
+    usePropertyApplications(propertyId);
+
+  // Fetch property details to pre-fill rent amount
+  const { data: property } = useProperty(propertyId);
+
+  // Filter only approved applications
+  const approvedApplications =
+    applications?.filter((app) => app.status === "approved") || [];
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
+    watch,
   } = useForm<LeaseFormData>({
     resolver: zodResolver(leaseSchema),
     defaultValues: {
@@ -61,6 +83,26 @@ export function CreateLeaseDialog({
       tenantResponsibilities: "Utilities, Cleaning, Minor Repairs",
     },
   });
+
+  const selectedTenant = watch("tenant");
+
+  // Pre-fill rent and deposit from property when it loads
+  useEffect(() => {
+    if (property) {
+      setValue("monthlyRent", property.pricing.monthlyRent.toString());
+      setValue(
+        "securityDeposit",
+        (property.pricing.securityDeposit || property.pricing.monthlyRent).toString()
+      );
+    }
+  }, [property, setValue]);
+
+  // If tenantId is passed as prop, set it
+  useEffect(() => {
+    if (tenantId) {
+      setValue("tenant", tenantId);
+    }
+  }, [tenantId, setValue]);
 
   const onSubmit = async (values: LeaseFormData) => {
     try {
@@ -93,6 +135,10 @@ export function CreateLeaseDialog({
     }
   };
 
+  const handleTenantSelect = (tenantId: string) => {
+    setValue("tenant", tenantId);
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -109,136 +155,180 @@ export function CreateLeaseDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="tenant">Tenant ID</Label>
-            <Input
-              id="tenant"
-              {...register("tenant")}
-              placeholder="Enter tenant user ID"
-            />
-            {errors.tenant && (
-              <p className="text-sm text-red-600 mt-1">
-                {errors.tenant.message}
-              </p>
-            )}
+        {applicationsLoading ? (
+          <div className="p-8 text-center text-gray-600">
+            Loading approved applications...
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        ) : approvedApplications.length === 0 && !tenantId ? (
+          <div className="p-8 text-center">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-yellow-500" />
+            <h3 className="text-lg font-medium mb-2">No Approved Applications</h3>
+            <p className="text-gray-600 text-sm">
+              You need to approve a tenant application before creating a lease.
+              Go to the Applications tab to review and approve applications.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Tenant Selection */}
             <div>
-              <Label htmlFor="startDate">Start Date</Label>
-              <Input id="startDate" type="date" {...register("startDate")} />
-              {errors.startDate && (
+              <Label htmlFor="tenant">Select Tenant *</Label>
+              {tenantId ? (
+                <Input
+                  id="tenant"
+                  {...register("tenant")}
+                  disabled
+                  className="bg-gray-100"
+                />
+              ) : (
+                <Select
+                  value={selectedTenant}
+                  onValueChange={handleTenantSelect}
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select an approved tenant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {approvedApplications.map((application) => {
+                      const tenant = application.tenant as any;
+                      return (
+                        <SelectItem key={tenant._id} value={tenant._id}>
+                          {tenant?.profile?.firstName} {tenant?.profile?.lastName}{" "}
+                          ({tenant?.email})
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
+              {errors.tenant && (
                 <p className="text-sm text-red-600 mt-1">
-                  {errors.startDate.message}
+                  {errors.tenant.message}
+                </p>
+              )}
+              {!tenantId && approvedApplications.length > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Only tenants with approved applications are shown
                 </p>
               )}
             </div>
 
-            <div>
-              <Label htmlFor="endDate">End Date</Label>
-              <Input id="endDate" type="date" {...register("endDate")} />
-              {errors.endDate && (
-                <p className="text-sm text-red-600 mt-1">
-                  {errors.endDate.message}
-                </p>
-              )}
-            </div>
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">Start Date *</Label>
+                <Input id="startDate" type="date" {...register("startDate")} />
+                {errors.startDate && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.startDate.message}
+                  </p>
+                )}
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="endDate">End Date *</Label>
+                <Input id="endDate" type="date" {...register("endDate")} />
+                {errors.endDate && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.endDate.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="monthlyRent">Monthly Rent ($) *</Label>
+                <Input
+                  id="monthlyRent"
+                  type="number"
+                  {...register("monthlyRent")}
+                  placeholder="3500"
+                />
+                {errors.monthlyRent && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.monthlyRent.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="securityDeposit">Security Deposit ($) *</Label>
+                <Input
+                  id="securityDeposit"
+                  type="number"
+                  {...register("securityDeposit")}
+                  placeholder="3500"
+                />
+                {errors.securityDeposit && (
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.securityDeposit.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="monthlyRent">Monthly Rent ($)</Label>
+              <Label htmlFor="paymentDueDate">
+                Payment Due Date (day of month) *
+              </Label>
               <Input
-                id="monthlyRent"
+                id="paymentDueDate"
                 type="number"
-                {...register("monthlyRent")}
-                placeholder="3500"
+                min="1"
+                max="31"
+                {...register("paymentDueDate")}
+                placeholder="1"
               />
-              {errors.monthlyRent && (
+              {errors.paymentDueDate && (
                 <p className="text-sm text-red-600 mt-1">
-                  {errors.monthlyRent.message}
+                  {errors.paymentDueDate.message}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="securityDeposit">Security Deposit ($)</Label>
-              <Input
-                id="securityDeposit"
-                type="number"
-                {...register("securityDeposit")}
-                placeholder="3500"
+              <Label htmlFor="landlordResponsibilities">
+                Landlord Responsibilities (comma-separated)
+              </Label>
+              <Textarea
+                id="landlordResponsibilities"
+                {...register("landlordResponsibilities")}
+                placeholder="Maintenance, Repairs, Property Taxes"
+                rows={2}
               />
-              {errors.securityDeposit && (
-                <p className="text-sm text-red-600 mt-1">
-                  {errors.securityDeposit.message}
-                </p>
-              )}
             </div>
-          </div>
 
-          <div>
-            <Label htmlFor="paymentDueDate">
-              Payment Due Date (day of month)
-            </Label>
-            <Input
-              id="paymentDueDate"
-              type="number"
-              min="1"
-              max="31"
-              {...register("paymentDueDate")}
-              placeholder="1"
-            />
-            {errors.paymentDueDate && (
-              <p className="text-sm text-red-600 mt-1">
-                {errors.paymentDueDate.message}
-              </p>
-            )}
-          </div>
+            <div>
+              <Label htmlFor="tenantResponsibilities">
+                Tenant Responsibilities (comma-separated)
+              </Label>
+              <Textarea
+                id="tenantResponsibilities"
+                {...register("tenantResponsibilities")}
+                placeholder="Utilities, Cleaning, Minor Repairs"
+                rows={2}
+              />
+            </div>
 
-          <div>
-            <Label htmlFor="landlordResponsibilities">
-              Landlord Responsibilities (comma-separated)
-            </Label>
-            <Textarea
-              id="landlordResponsibilities"
-              {...register("landlordResponsibilities")}
-              placeholder="Maintenance, Repairs, Property Taxes"
-              rows={2}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="tenantResponsibilities">
-              Tenant Responsibilities (comma-separated)
-            </Label>
-            <Textarea
-              id="tenantResponsibilities"
-              {...register("tenantResponsibilities")}
-              placeholder="Utilities, Cleaning, Minor Repairs"
-              rows={2}
-            />
-          </div>
-
-          <div className="flex gap-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="flex-1"
-            >
-              {createMutation.isPending ? "Creating..." : "Create Lease"}
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || !selectedTenant}
+                className="flex-1"
+              >
+                {createMutation.isPending ? "Creating..." : "Create Lease"}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

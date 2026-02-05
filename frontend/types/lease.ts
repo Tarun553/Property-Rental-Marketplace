@@ -24,7 +24,7 @@ export interface Lease {
   tenant: string | any; // User ID or populated user
   terms: LeaseTerms;
   responsibilities: LeaseResponsibilities;
-  status: "pending" | "active" | "signed" | "terminated" | "expired";
+  status: "draft" | "pending_signatures" | "active" | "expired" | "terminated";
   signatures?: {
     landlord?: {
       signed: boolean;

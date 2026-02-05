@@ -59,7 +59,7 @@ function TenantMaintenanceTab({ userId }: { userId: string }) {
 
   // Get the first active lease's property ID for the request form
   const activeProperty = leases?.find(
-    (lease) => lease.status === "active" || lease.status === "signed",
+    (lease) => lease.status === "active" || lease.status === "pending_signatures",
   )?.property;
 
   const propertyId =

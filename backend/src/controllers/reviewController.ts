@@ -9,7 +9,6 @@ import {
 import { AuthRequest } from "../middleware/auth.js";
 import { UserRole, LeaseStatus } from "../types/index.js";
 
-
 export const createReview = async (req: AuthRequest, res: Response) => {
   try {
     const validation = reviewCreateSchema.safeParse(req.body);
@@ -17,7 +16,12 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: validation.error.format() });
     }
 
-    const { property, reviewee, lease: leaseId, reviewerRole } = validation.data;
+    const {
+      property,
+      reviewee,
+      lease: leaseId,
+      reviewerRole,
+    } = validation.data;
 
     // Check if property exists
     const propertyExists = await Property.findById(property);
@@ -35,18 +39,21 @@ export const createReview = async (req: AuthRequest, res: Response) => {
       const validLease = await Lease.findOne({
         property: property,
         tenant: req.user._id,
-        status: { $in: [LeaseStatus.ACTIVE, LeaseStatus.EXPIRED, "signed"] },
+        status: { $in: [LeaseStatus.ACTIVE, LeaseStatus.EXPIRED] },
       });
 
       if (!validLease) {
-        return res.status(403).json({ 
-          message: "You can only review properties you have rented with an active or completed lease" 
+        return res.status(403).json({
+          message:
+            "You can only review properties you have rented with an active or completed lease",
         });
       }
 
       // Verify the reviewee is the landlord of the property
       if (propertyExists.landlord.toString() !== reviewee) {
-        return res.status(400).json({ message: "Invalid reviewee for this property" });
+        return res
+          .status(400)
+          .json({ message: "Invalid reviewee for this property" });
       }
     }
 
@@ -56,12 +63,13 @@ export const createReview = async (req: AuthRequest, res: Response) => {
         property: property,
         landlord: req.user._id,
         tenant: reviewee,
-        status: { $in: [LeaseStatus.ACTIVE, LeaseStatus.EXPIRED, "signed"] },
+        status: { $in: [LeaseStatus.ACTIVE, LeaseStatus.EXPIRED] },
       });
 
       if (!validLease) {
-        return res.status(403).json({ 
-          message: "You can only review tenants who have had an active or completed lease on your property" 
+        return res.status(403).json({
+          message:
+            "You can only review tenants who have had an active or completed lease on your property",
         });
       }
     }
@@ -73,7 +81,9 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     });
 
     if (existingReview) {
-      return res.status(400).json({ message: "You have already reviewed this property" });
+      return res
+        .status(400)
+        .json({ message: "You have already reviewed this property" });
     }
 
     const review = await Review.create({
@@ -94,7 +104,6 @@ export const createReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 export const getPropertyReviews = async (req: Request, res: Response) => {
   try {
     const reviews = await Review.find({ property: req.params.propertyId })
@@ -105,7 +114,6 @@ export const getPropertyReviews = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const getUserReviews = async (req: Request, res: Response) => {
   try {
@@ -118,7 +126,6 @@ export const getUserReviews = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 // Get reviews written by a specific user
 export const getReviewsByReviewer = async (req: AuthRequest, res: Response) => {
@@ -137,7 +144,6 @@ export const getReviewsByReviewer = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const respondToReview = async (req: AuthRequest, res: Response) => {
   try {
