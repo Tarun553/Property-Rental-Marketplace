@@ -11,6 +11,7 @@ import authRoutes from "./routes/auth.js";
 import propertyRoutes from "./routes/properties.js";
 import applicationRoutes from "./routes/applications.js";
 import leaseRoutes from "./routes/leases.js";
+import maintenanceRoutes from "./routes/maintenance.js";
 
 connectDB();
 
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/leases", leaseRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "API is running..." });

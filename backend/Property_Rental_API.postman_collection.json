@@ -554,6 +554,124 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Maintenance",
+      "item": [
+        {
+          "name": "Submit Maintenance Request",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "property",
+                  "value": "{{propertyId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Leaking Faucet",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "The kitchen faucet has been leaking since this morning.",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "plumbing",
+                  "type": "text"
+                },
+                {
+                  "key": "priority",
+                  "value": "medium",
+                  "type": "text"
+                },
+                {
+                  "key": "photos",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/maintenance",
+              "host": ["{{base_url}}"],
+              "path": ["maintenance"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Requests (Landlord)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/maintenance/property/{{propertyId}}",
+              "host": ["{{base_url}}"],
+              "path": ["maintenance", "property", "{{propertyId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Maintenance Status (Landlord)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"acknowledged\",\n    \"landlordResponse\": \"I will send a plumber tomorrow at 10 AM.\",\n    \"priority\": \"high\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/maintenance/{{maintenanceId}}/status",
+              "host": ["{{base_url}}"],
+              "path": ["maintenance", "{{maintenanceId}}", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
