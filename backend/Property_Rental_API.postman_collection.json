@@ -439,6 +439,121 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Leases",
+      "item": [
+        {
+          "name": "Create Lease",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"property\": \"{{propertyId}}\",\n    \"tenant\": \"{{tenantId}}\",\n    \"terms\": {\n        \"startDate\": \"2024-03-01\",\n        \"endDate\": \"2025-02-28\",\n        \"monthlyRent\": 3500,\n        \"securityDeposit\": 3500,\n        \"paymentDueDate\": 1\n    },\n    \"responsibilities\": {\n        \"landlord\": [\"Maintenance\", \"Taxes\"],\n        \"tenant\": [\"Utilities\", \"Cleaning\"]\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/leases",
+              "host": ["{{base_url}}"],
+              "path": ["leases"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lease Details",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leases/{{leaseId}}",
+              "host": ["{{base_url}}"],
+              "path": ["leases", "{{leaseId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Lease",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"signatureData\": \"Full Name / Digital Signature\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/leases/{{leaseId}}/sign",
+              "host": ["{{base_url}}"],
+              "path": ["leases", "{{leaseId}}", "sign"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Leases (Landlord)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leases/property/{{propertyId}}",
+              "host": ["{{base_url}}"],
+              "path": ["leases", "property", "{{propertyId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
