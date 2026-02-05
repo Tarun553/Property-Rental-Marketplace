@@ -767,6 +767,80 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "Get User Threads",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/threads",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "threads"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Conversation History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/{{conversationId}}",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "{{conversationId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/messages/{{conversationId}}/read",
+              "host": ["{{base_url}}"],
+              "path": ["messages", "{{conversationId}}", "read"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [

@@ -40,7 +40,6 @@ const messageThreadSchema = new mongoose.Schema(
   },
 );
 
-messageThreadSchema.index({ conversationId: 1 });
 messageThreadSchema.index({ participants: 1 });
 messageThreadSchema.index({ lastMessageAt: -1 });
 
