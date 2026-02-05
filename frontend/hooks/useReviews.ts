@@ -2,8 +2,13 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { Review, CreateReviewPayload, ReviewResponsePayload } from "@/types/review";
+import {
+  Review,
+  CreateReviewPayload,
+  ReviewResponsePayload,
+} from "@/types/review";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export const useReviews = () => {
   const queryClient = useQueryClient();
@@ -52,26 +57,36 @@ export const useReviews = () => {
     },
     onSuccess: (_, variables) => {
       toast.success("Review submitted successfully!");
-      queryClient.invalidateQueries({ queryKey: ["reviews", "property", variables.property] });
-      queryClient.invalidateQueries({ queryKey: ["reviews", "user", variables.reviewee] });
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", "property", variables.property],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", "user", variables.reviewee],
+      });
       queryClient.invalidateQueries({ queryKey: ["reviews", "written"] });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message: string }>) => {
       toast.error(error.response?.data?.message || "Failed to submit review");
     },
   });
 
   // Respond to review mutation
   const respondToReview = useMutation({
-    mutationFn: async ({ reviewId, response }: { reviewId: string; response: ReviewResponsePayload }) => {
+    mutationFn: async ({
+      reviewId,
+      response,
+    }: {
+      reviewId: string;
+      response: ReviewResponsePayload;
+    }) => {
       const { data } = await api.put(`/reviews/${reviewId}/response`, response);
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Response added successfully!");
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message: string }>) => {
       toast.error(error.response?.data?.message || "Failed to add response");
     },
   });

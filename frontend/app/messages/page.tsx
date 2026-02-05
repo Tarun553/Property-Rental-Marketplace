@@ -12,11 +12,14 @@ import { MessageSquare, Loader2 } from "lucide-react";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { toast } from "sonner";
 
-const MessagesPage = () => {
+import { Suspense } from "react";
+
+const MessagesContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const [selectedConversationId, setSelectedConversationId] = useState<string>();
+  const [selectedConversationId, setSelectedConversationId] =
+    useState<string>();
   const [isInitializing, setIsInitializing] = useState(false);
 
   const {
@@ -49,7 +52,9 @@ const MessagesPage = () => {
           // Clear URL params after successful start
           router.replace("/messages");
         } catch (error: any) {
-          toast.error(error.response?.data?.message || "Failed to start conversation");
+          toast.error(
+            error.response?.data?.message || "Failed to start conversation",
+          );
           router.replace("/messages");
         } finally {
           setIsInitializing(false);
@@ -69,7 +74,7 @@ const MessagesPage = () => {
   const handleSendMessage = (content: string) => {
     if (conversation) {
       const otherParticipant = conversation.participants.find(
-        (p) => p._id !== user?._id
+        (p) => p._id !== user?._id,
       );
 
       sendMessage({
@@ -118,7 +123,8 @@ const MessagesPage = () => {
                   <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
                   <p>No conversations yet</p>
                   <p className="text-sm mt-2">
-                    Start a conversation by contacting a landlord on a property listing
+                    Start a conversation by contacting a landlord on a property
+                    listing
                   </p>
                 </div>
               )}
@@ -131,7 +137,9 @@ const MessagesPage = () => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-                  <p className="text-muted-foreground">Loading conversation...</p>
+                  <p className="text-muted-foreground">
+                    Loading conversation...
+                  </p>
                 </div>
               </div>
             ) : conversation ? (
@@ -157,6 +165,20 @@ const MessagesPage = () => {
         </div>
       </div>
     </ProtectedRoute>
+  );
+};
+
+const MessagesPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      }
+    >
+      <MessagesContent />
+    </Suspense>
   );
 };
 

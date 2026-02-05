@@ -145,8 +145,7 @@ export const ReviewForm = ({ onSuccess }: ReviewFormProps) => {
   };
 
   const availableCriteria = Object.entries(criteriaLabels).filter(
-    ([_criteriaKey, config]) =>
-      config.roles.includes(user?.role as "landlord" | "tenant"),
+    ([, config]) => config.roles.includes(user?.role as "landlord" | "tenant"),
   );
 
   if (leasesLoading) {

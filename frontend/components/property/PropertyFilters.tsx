@@ -28,7 +28,10 @@ export function PropertyFilters({
   const [filters, setFilters] = useState<PropertyFiltersType>(initialFilters);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleFilterChange = (key: keyof PropertyFiltersType, value: any) => {
+  const handleFilterChange = (
+    key: keyof PropertyFiltersType,
+    value: PropertyFiltersType[keyof PropertyFiltersType],
+  ) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFilterChange(newFilters);

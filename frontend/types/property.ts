@@ -1,6 +1,16 @@
 export interface Property {
   _id: string;
-  landlord: string;
+  landlord:
+    | string
+    | {
+        _id: string;
+        profile: {
+          firstName: string;
+          lastName: string;
+          avatar?: string;
+        };
+        email: string;
+      };
   title: string;
   description: string;
   type: "apartment" | "house" | "condo" | "commercial" | "other";
