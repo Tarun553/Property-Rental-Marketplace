@@ -68,10 +68,11 @@ export const ReviewForm = ({ onSuccess }: ReviewFormProps) => {
 
   // Determine reviewee (landlord) from the lease
   // The lease object has the landlord populated directly
-  const revieweeId =
-    selectedLease && typeof selectedLease.landlord === "object"
+  const revieweeId = selectedLease
+    ? typeof selectedLease.landlord === "object"
       ? selectedLease.landlord._id
-      : selectedLease?.landlord;
+      : (selectedLease.landlord as string)
+    : undefined;
 
   const handleFormSubmit = async (formData: { comment?: string }) => {
     if (!selectedPropertyId) {
