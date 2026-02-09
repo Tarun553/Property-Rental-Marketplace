@@ -119,6 +119,30 @@ export const getTenantApplications = asyncHandler(
   },
 );
 
+export const getLandlordApplications = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    if (
+      req.user._id.toString() !== req.params.userId &&
+      req.user.role !== UserRole.ADMIN
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const applications = await Application.find({
+      landlord: req.params.userId,
+    })
+      .populate("tenant", "profile email")
+      .populate("property", "title address pricing")
+      .sort("-createdAt");
+
+    res.json(applications);
+  },
+);
+
 export const updateApplicationStatus = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const validation = applicationStatusUpdateSchema.safeParse(req.body);

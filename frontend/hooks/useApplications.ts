@@ -66,6 +66,19 @@ export const usePropertyApplications = (propertyId: string) => {
   });
 };
 
+export const useLandlordApplications = (userId: string) => {
+  return useQuery({
+    queryKey: ["applications", "landlord", userId],
+    queryFn: async () => {
+      const { data } = await api.get<Application[]>(
+        `/applications/landlord/${userId}`,
+      );
+      return data;
+    },
+    enabled: !!userId,
+  });
+};
+
 export const useUpdateApplicationStatus = () => {
   const queryClient = useQueryClient();
 

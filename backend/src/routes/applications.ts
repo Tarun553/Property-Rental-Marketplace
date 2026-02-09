@@ -3,6 +3,7 @@ import {
   submitApplication,
   getPropertyApplications,
   getTenantApplications,
+  getLandlordApplications,
   updateApplicationStatus,
 } from "../controllers/applicationController.js";
 import { protect, authorize } from "../middleware/auth.js";
@@ -31,6 +32,13 @@ router.get(
   protect,
   authorize(UserRole.TENANT),
   getTenantApplications,
+);
+
+router.get(
+  "/landlord/:userId",
+  protect,
+  authorize(UserRole.LANDLORD),
+  getLandlordApplications,
 );
 
 router.put(

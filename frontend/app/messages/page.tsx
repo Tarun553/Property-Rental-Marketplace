@@ -52,6 +52,7 @@ const MessagesContent = () => {
           // Clear URL params after successful start
           router.replace("/messages");
         } catch (error: any) {
+          console.log(error);
           toast.error(
             error.response?.data?.message || "Failed to start conversation",
           );
@@ -96,9 +97,9 @@ const MessagesContent = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 h-[calc(100vh-220px)]">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6 lg:h-[calc(100vh-220px)]">
           {/* Threads List */}
-          <Card className="lg:col-span-1 overflow-hidden flex flex-col">
+          <Card className="lg:col-span-1 overflow-hidden flex flex-col lg:min-h-0 max-h-[45vh] lg:max-h-none">
             <div className="p-4 border-b">
               <h2 className="font-semibold">Conversations</h2>
               {isSocketConnected && (
@@ -132,7 +133,7 @@ const MessagesContent = () => {
           </Card>
 
           {/* Message Thread */}
-          <Card className="lg:col-span-2 overflow-hidden">
+          <Card className="lg:col-span-2 overflow-hidden min-h-[55vh] lg:min-h-0">
             {conversationLoading || isStartingConversation ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">

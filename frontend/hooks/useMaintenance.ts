@@ -97,3 +97,16 @@ export const useTenantMaintenance = (tenantId: string) => {
     enabled: !!tenantId,
   });
 };
+
+export const useLandlordMaintenance = (landlordId: string) => {
+  return useQuery({
+    queryKey: ["maintenance", "landlord", landlordId],
+    queryFn: async () => {
+      const { data } = await api.get<MaintenanceRequest[]>(
+        `/maintenance/landlord/${landlordId}`,
+      );
+      return data;
+    },
+    enabled: !!landlordId,
+  });
+};

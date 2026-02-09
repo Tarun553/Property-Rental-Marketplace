@@ -1,6 +1,5 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -18,11 +17,9 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface AvailabilityFormProps {
-  form: UseFormReturn<any>;
-}
+import { PropertyFormProps } from "@/types/form";
 
-export function AvailabilityForm({ form }: AvailabilityFormProps) {
+export function AvailabilityForm({ form }: PropertyFormProps) {
   return (
     <Card>
       <CardHeader>

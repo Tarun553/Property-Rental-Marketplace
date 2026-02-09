@@ -16,8 +16,8 @@ export const initSocket = (token: string): Socket => {
     auth: {
       token,
     },
-    transports: ["websocket"], // Hard-force websocket to bypass cookie issues on mobile
-    upgrade: false,
+    // Allow fallback to long-polling on mobile networks that block websockets
+    transports: ["websocket", "polling"],
     autoConnect: true,
     reconnection: true,
     reconnectionDelay: 1000,

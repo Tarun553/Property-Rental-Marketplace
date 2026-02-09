@@ -1,6 +1,5 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -11,11 +10,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface LocationFormProps {
-  form: UseFormReturn<any>;
-}
+import { PropertyFormProps } from "@/types/form";
 
-export function LocationForm({ form }: LocationFormProps) {
+export function LocationForm({ form }: PropertyFormProps) {
   return (
     <Card>
       <CardHeader>

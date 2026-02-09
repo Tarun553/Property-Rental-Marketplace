@@ -3,6 +3,7 @@ import {
   createMaintenanceRequest,
   getPropertyMaintenanceRequests,
   getTenantMaintenanceRequests,
+  getLandlordMaintenanceRequests,
   updateMaintenanceStatus,
 } from "../controllers/maintenanceController.js";
 import { protect, authorize } from "../middleware/auth.js";
@@ -31,6 +32,13 @@ router.get(
   protect,
   authorize(UserRole.TENANT),
   getTenantMaintenanceRequests,
+);
+
+router.get(
+  "/landlord/:userId",
+  protect,
+  authorize(UserRole.LANDLORD),
+  getLandlordMaintenanceRequests,
 );
 
 router.put(

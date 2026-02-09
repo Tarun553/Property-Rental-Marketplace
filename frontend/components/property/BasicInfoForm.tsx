@@ -1,6 +1,5 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -19,11 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface BasicInfoFormProps {
-  form: UseFormReturn<any>;
-}
+import { PropertyFormProps } from "@/types/form";
 
-export function BasicInfoForm({ form }: BasicInfoFormProps) {
+export function BasicInfoForm({ form }: PropertyFormProps) {
   return (
     <Card>
       <CardHeader>

@@ -100,6 +100,30 @@ export const getTenantMaintenanceRequests = asyncHandler(
   },
 );
 
+export const getLandlordMaintenanceRequests = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    if (
+      req.user._id.toString() !== req.params.userId &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    const requests = await MaintenanceRequest.find({
+      landlord: req.params.userId,
+    })
+      .populate("tenant", "profile email")
+      .populate("property", "title address pricing")
+      .sort("-createdAt");
+
+    res.json(requests);
+  },
+);
+
 export const updateMaintenanceStatus = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const validation = maintenanceStatusUpdateSchema.safeParse(req.body);

@@ -1,6 +1,5 @@
 "use client";
 
-import { UseFormReturn } from "react-hook-form";
 import {
   FormControl,
   FormField,
@@ -12,11 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface PricingFormProps {
-  form: UseFormReturn<any>;
-}
+import { PropertyFormProps } from "@/types/form";
 
-export function PricingForm({ form }: PricingFormProps) {
+export function PricingForm({ form }: PropertyFormProps) {
   return (
     <Card>
       <CardHeader>

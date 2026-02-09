@@ -1,22 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { FormField, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
-
-interface AmenitiesFormProps {
-  form: UseFormReturn<any>;
-}
+import { PropertyFormProps } from "@/types/form";
 
 const COMMON_AMENITIES = [
   "Parking",
@@ -31,12 +22,12 @@ const COMMON_AMENITIES = [
   "Security",
 ];
 
-export function AmenitiesForm({ form }: AmenitiesFormProps) {
+export function AmenitiesForm({ form }: PropertyFormProps) {
   const [customAmenity, setCustomAmenity] = useState("");
   const amenities = form.watch("amenities") || [];
 
   const toggleAmenity = (amenity: string) => {
-    const current = amenities;
+    const current = amenities as unknown as string[];
     if (current.includes(amenity)) {
       form.setValue(
         "amenities",
@@ -48,16 +39,18 @@ export function AmenitiesForm({ form }: AmenitiesFormProps) {
   };
 
   const addCustomAmenity = () => {
-    if (customAmenity.trim() && !amenities.includes(customAmenity.trim())) {
-      form.setValue("amenities", [...amenities, customAmenity.trim()]);
+    const current = amenities as unknown as string[];
+    if (customAmenity.trim() && !current.includes(customAmenity.trim())) {
+      form.setValue("amenities", [...current, customAmenity.trim()]);
       setCustomAmenity("");
     }
   };
 
   const removeAmenity = (amenity: string) => {
+    const current = amenities as unknown as string[];
     form.setValue(
       "amenities",
-      amenities.filter((a: string) => a !== amenity),
+      current.filter((a: string) => a !== amenity),
     );
   };
 
@@ -91,9 +84,12 @@ export function AmenitiesForm({ form }: AmenitiesFormProps) {
               placeholder="e.g., Rooftop Access"
               value={customAmenity}
               onChange={(e) => setCustomAmenity(e.target.value)}
-              onKeyPress={(e) =>
-                e.key === "Enter" && (e.preventDefault(), addCustomAmenity())
-              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCustomAmenity();
+                }
+              }}
             />
             <Button type="button" onClick={addCustomAmenity}>
               <Plus className="h-4 w-4" />
@@ -105,7 +101,7 @@ export function AmenitiesForm({ form }: AmenitiesFormProps) {
           <div>
             <FormLabel>Selected Amenities</FormLabel>
             <div className="flex flex-wrap gap-2 mt-2">
-              {amenities.map((amenity: string) => (
+              {(amenities as string[]).map((amenity: string) => (
                 <Badge key={amenity} variant="secondary">
                   {amenity}
                   <button
