@@ -27,26 +27,43 @@ connectRedis();
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true,
+
+// Clean frontend URL and define CORS
+const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, "");
+const allowedOrigins = [
+  frontendUrl,
+  "http://localhost:3000",
+  "http://localhost:5173",
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+  ) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+};
+
+const io = new Server(httpServer, {
+  cors: corsOptions,
+  transports: ["polling", "websocket"],
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
-  }),
-);
+app.use(cors(corsOptions));
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(globalLimiter);
+// Apply rate limiter ONLY to /api routes to avoid blocking socket handshakes
+app.use("/api", globalLimiter);
 
 // Routes
 app.use("/api/auth", authRoutes);

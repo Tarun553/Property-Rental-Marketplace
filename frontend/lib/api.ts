@@ -1,7 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  baseURL:
+    (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(
+      /\/$/,
+      "",
+    ) + "/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -9,6 +13,11 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    // Strip leading slash from URL to ensure it appends to baseURL path correctly
+    if (config.url?.startsWith("/")) {
+      config.url = config.url.substring(1);
+    }
+
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (token) {
