@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 interface PropertyCardProps {
   property: Property;
@@ -27,7 +28,8 @@ export function PropertyCard({
   property,
   variant = "default",
 }: PropertyCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
+  const [favorites, setFavorites] = useLocalStorage<string[]>("favorites", []);
+  const isLiked = favorites.includes(property._id);
   const [imageError, setImageError] = useState(false);
   const mainPhoto = property.media.photos[0] || "/placeholder-property.jpg";
 
@@ -48,7 +50,11 @@ export function PropertyCard({
   const handleLikeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsLiked(!isLiked);
+    if (isLiked) {
+      setFavorites(favorites.filter((id) => id !== property._id));
+    } else {
+      setFavorites([...favorites, property._id]);
+    }
   };
 
   if (variant === "compact") {
