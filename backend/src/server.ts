@@ -28,12 +28,11 @@ connectRedis();
 const app = express();
 const httpServer = createServer(app);
 
-// Clean frontend URL and define CORS
+
 const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, "");
 const allowedOrigins = [
   frontendUrl,
   "http://localhost:3000",
-  "http://localhost:5173",
 ].filter(Boolean);
 
 const corsOptions = {

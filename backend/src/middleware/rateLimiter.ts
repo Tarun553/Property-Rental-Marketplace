@@ -13,12 +13,13 @@ export const globalLimiter = rateLimit({
   }),
 });
 
-// Stricter rate limiter for sensitive routes (auth)
+// rate limit for authh routes
 export const authLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // Limit each IP to 10 requests per hour for login/signup
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 100,
   message: {
-    message: "Too many attempts from this IP, please try again after an hour",
+    message:
+      "Too many attempts from this IP, please try again after 1 minutes",
   },
   standardHeaders: true,
   legacyHeaders: false,
