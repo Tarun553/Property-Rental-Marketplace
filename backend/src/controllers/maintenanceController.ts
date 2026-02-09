@@ -8,12 +8,10 @@ import {
 import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { MaintenanceStatus } from "../types/index.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
-export const createMaintenanceRequest = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const createMaintenanceRequest = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = maintenanceRequestCreateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -51,17 +49,11 @@ export const createMaintenanceRequest = async (
     });
 
     res.status(201).json(maintenanceRequest);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getPropertyMaintenanceRequests = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getPropertyMaintenanceRequests = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const property = await Property.findById(req.params.propertyId);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
@@ -82,16 +74,11 @@ export const getPropertyMaintenanceRequests = async (
       .sort("-createdAt");
 
     res.json(requests);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getTenantMaintenanceRequests = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getTenantMaintenanceRequests = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -110,16 +97,11 @@ export const getTenantMaintenanceRequests = async (
       .sort("-createdAt");
 
     res.json(requests);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const updateMaintenanceStatus = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const updateMaintenanceStatus = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = maintenanceStatusUpdateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -162,8 +144,5 @@ export const updateMaintenanceStatus = async (
     await maintenanceRequest.save();
 
     res.json(maintenanceRequest);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);

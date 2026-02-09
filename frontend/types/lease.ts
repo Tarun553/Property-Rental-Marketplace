@@ -1,3 +1,6 @@
+import { Property } from "./property";
+import { User } from "./maintenance";
+
 export interface LeaseTerms {
   startDate: string | Date;
   endDate: string | Date;
@@ -19,9 +22,9 @@ export interface LeaseSignature {
 
 export interface Lease {
   _id: string;
-  property: string | any; // Property ID or populated property
-  landlord: string | any; // User ID or populated user
-  tenant: string | any; // User ID or populated user
+  property: string | Property; // Property ID or populated property
+  landlord: string | User; // User ID or populated user
+  tenant: string | User; // User ID or populated user
   terms: LeaseTerms;
   responsibilities: LeaseResponsibilities;
   status: "draft" | "pending_signatures" | "active" | "expired" | "terminated";

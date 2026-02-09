@@ -8,6 +8,8 @@ import {
 import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { ApplicationStatus, UserRole } from "../types/index.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
+
 
 // Helper to parse multipart fields
 const parseFields = (body: Record<string, any>) => {
@@ -23,8 +25,8 @@ const parseFields = (body: Record<string, any>) => {
   });
 };
 
-export const submitApplication = async (req: AuthRequest, res: Response) => {
-  try {
+export const submitApplication = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     parseFields(req.body);
 
     const validation = applicationSubmitSchema.safeParse(req.body);
@@ -70,17 +72,11 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
     });
 
     res.status(201).json(application);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getPropertyApplications = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getPropertyApplications = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const property = await Property.findById(req.params.propertyId);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
@@ -99,16 +95,11 @@ export const getPropertyApplications = async (
       .sort("-createdAt");
 
     res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getTenantApplications = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getTenantApplications = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -125,16 +116,11 @@ export const getTenantApplications = async (
       .sort("-createdAt");
 
     res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const updateApplicationStatus = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const updateApplicationStatus = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = applicationStatusUpdateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -159,7 +145,5 @@ export const updateApplicationStatus = async (
     await application.save();
 
     res.json(application);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);

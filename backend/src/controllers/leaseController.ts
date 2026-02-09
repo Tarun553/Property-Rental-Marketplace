@@ -4,9 +4,10 @@ import Property from "../models/Property.js";
 import { leaseCreateSchema, leaseSignSchema } from "../validators/lease.js";
 import { AuthRequest } from "../middleware/auth.js";
 import { LeaseStatus, UserRole } from "../types/index.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
-export const createLease = async (req: AuthRequest, res: Response) => {
-  try {
+export const createLease = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = leaseCreateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -34,14 +35,11 @@ export const createLease = async (req: AuthRequest, res: Response) => {
     });
 
     res.status(201).json(lease);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getLeaseById = async (req: AuthRequest, res: Response) => {
-  try {
+export const getLeaseById = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const lease = await Lease.findById(req.params.id)
       .populate("property", "title address pricing")
       .populate("landlord", "profile email")
@@ -66,13 +64,11 @@ export const getLeaseById = async (req: AuthRequest, res: Response) => {
     }
 
     res.json(lease);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const signLease = async (req: AuthRequest, res: Response) => {
-  try {
+export const signLease = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = leaseSignSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -125,13 +121,11 @@ export const signLease = async (req: AuthRequest, res: Response) => {
     await lease.save();
 
     res.json(lease);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
-  try {
+export const getPropertyLeases = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const property = await Property.findById(req.params.propertyId);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
@@ -150,13 +144,11 @@ export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
       .sort("-createdAt");
 
     res.json(leases);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getTenantLeases = async (req: AuthRequest, res: Response) => {
-  try {
+export const getTenantLeases = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -172,7 +164,5 @@ export const getTenantLeases = async (req: AuthRequest, res: Response) => {
       .sort("-createdAt");
 
     res.json(leases);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);

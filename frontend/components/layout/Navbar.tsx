@@ -23,7 +23,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  User,
   LogOut,
   LayoutDashboard,
   Building2,
@@ -35,7 +34,7 @@ import {
   Settings,
   HelpCircle,
   ChevronRight,
-  Home,
+  
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -145,9 +144,9 @@ export function Navbar() {
                     className="rounded-full relative"
                   >
                     <Bell className="h-5 w-5" />
-                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {/* <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
                       3
-                    </span>
+                    </span> */}
                   </Button>
                 </div>
 

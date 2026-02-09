@@ -1,3 +1,15 @@
+import { Property } from "./property";
+
+export interface User {
+  _id: string;
+  email: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+    avatar?: string;
+  };
+}
+
 export enum MaintenanceCategory {
   PLUMBING = "plumbing",
   ELECTRICAL = "electrical",
@@ -23,21 +35,17 @@ export enum MaintenanceStatus {
   CANCELLED = "cancelled",
 }
 
-export interface MaintenancePhoto {
-  url: string;
-  publicId: string;
-}
-
 export interface MaintenanceRequest {
   _id: string;
-  property: string | any; // Property ID or populated property
-  tenant: string | any; // User ID or populated user
+  property: string | Property; // Property ID or populated property
+  tenant: string | User; // User ID or populated user
   title: string;
+
   description: string;
   category: MaintenanceCategory;
   priority: MaintenancePriority;
   status: MaintenanceStatus;
-  photos: MaintenancePhoto[];
+  photos: string[];
   landlordResponse?: string;
   resolvedAt?: Date;
   createdAt: Date;

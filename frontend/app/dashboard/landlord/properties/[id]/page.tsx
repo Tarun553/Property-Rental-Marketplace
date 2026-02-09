@@ -69,6 +69,7 @@ function LeasesTab({ propertyId }: { propertyId: string }) {
 // Maintenance Tab Component
 function MaintenanceTab({ propertyId }: { propertyId: string }) {
   const { data: requests, isLoading } = usePropertyMaintenance(propertyId);
+  console.log(requests);
 
   return (
     <div className="space-y-4">

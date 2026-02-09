@@ -8,9 +8,10 @@ import {
 } from "../validators/review.js";
 import { AuthRequest } from "../middleware/auth.js";
 import { UserRole, LeaseStatus } from "../types/index.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
-export const createReview = async (req: AuthRequest, res: Response) => {
-  try {
+export const createReview = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = reviewCreateSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -102,38 +103,31 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     ]);
 
     res.status(201).json(review);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getPropertyReviews = async (req: Request, res: Response) => {
-  try {
+export const getPropertyReviews = asyncHandler(
+  async (req: Request, res: Response) => {
     const reviews = await Review.find({ property: req.params.propertyId })
       .populate("reviewer", "profile email")
       .sort("-createdAt");
     res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getUserReviews = async (req: Request, res: Response) => {
-  try {
+export const getUserReviews = asyncHandler(
+  async (req: Request, res: Response) => {
     const reviews = await Review.find({ reviewee: req.params.userId })
       .populate("reviewer", "profile email")
       .populate("property", "title address")
       .sort("-createdAt");
     res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
 // Get reviews written by a specific user
-export const getReviewsByReviewer = async (req: AuthRequest, res: Response) => {
-  try {
+export const getReviewsByReviewer = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     // Only allow users to see their own written reviews
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
@@ -148,13 +142,11 @@ export const getReviewsByReviewer = async (req: AuthRequest, res: Response) => {
       .populate("property", "title address")
       .sort("-createdAt");
     res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const respondToReview = async (req: AuthRequest, res: Response) => {
-  try {
+export const respondToReview = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = reviewResponseSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -180,7 +172,5 @@ export const respondToReview = async (req: AuthRequest, res: Response) => {
     await review.save();
 
     res.json(review);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);

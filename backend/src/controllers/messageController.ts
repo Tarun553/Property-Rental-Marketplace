@@ -3,10 +3,11 @@ import MessageThread from "../models/Message.js";
 import { AuthRequest } from "../middleware/auth.js";
 import User from "../models/User.js";
 import { messageStartSchema } from "../validators/message.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
 // Create or get existing conversation between two users
-export const startConversation = async (req: AuthRequest, res: Response) => {
-  try {
+export const startConversation = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const validation = messageStartSchema.safeParse(req.body);
     if (!validation.success) {
       return res.status(400).json({ errors: validation.error.format() });
@@ -80,14 +81,11 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
     ]);
 
     res.status(201).json(thread);
-  } catch (error) {
-    console.error("Start conversation error:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getUserThreads = async (req: AuthRequest, res: Response) => {
-  try {
+export const getUserThreads = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -99,16 +97,11 @@ export const getUserThreads = async (req: AuthRequest, res: Response) => {
       .sort("-lastMessageAt");
 
     res.json(threads);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getConversationHistory = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getConversationHistory = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -124,13 +117,11 @@ export const getConversationHistory = async (
     }
 
     res.json(thread);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const markAsRead = async (req: AuthRequest, res: Response) => {
-  try {
+export const markAsRead = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     if (!req.user) {
       return res.status(401).json({ message: "Not authorized" });
     }
@@ -153,7 +144,5 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
 
     await thread.save();
     res.json({ message: "Messages marked as read" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);

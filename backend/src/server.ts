@@ -20,6 +20,7 @@ import maintenanceRoutes from "./routes/maintenance.js";
 import reviewRoutes from "./routes/reviews.js";
 import messageRoutes from "./routes/messages.js";
 import { socketHandler } from "./socket/socketHandler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 connectDB();
 connectRedis();
@@ -56,6 +57,9 @@ app.get("/", (req, res) => {
 
 // Initialize socket handlers
 socketHandler(io);
+
+// Error handling middleware
+app.use(errorHandler);
 
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

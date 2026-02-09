@@ -18,6 +18,7 @@ import {
   Calendar,
   ArrowUp,
 } from "lucide-react";
+import Image from "next/image";
 
 interface MaintenanceCardProps {
   request: MaintenanceRequest;
@@ -28,7 +29,6 @@ interface MaintenanceCardProps {
 export function MaintenanceCard({
   request,
   onViewDetails,
-  userRole,
 }: MaintenanceCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -124,10 +124,13 @@ export function MaintenanceCard({
                 key={idx}
                 className="w-16 h-16 rounded overflow-hidden bg-gray-100"
               >
-                <img
-                  src={photo.url}
+                <Image
+                  src={photo}
                   alt={`Photo ${idx + 1}`}
                   className="w-full h-full object-cover"
+                  priority
+                  width={64}
+                  height={64}
                 />
               </div>
             ))}

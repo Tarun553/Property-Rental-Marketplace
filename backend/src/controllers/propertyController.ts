@@ -7,6 +7,7 @@ import {
 import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { deletePattern } from "../utils/redis.js";
+import { asyncHandler } from "../middleware/asyncHandler.js";
 
 // Helper to parse multipart fields
 const parseFields = (body: Record<string, any>) => {
@@ -29,8 +30,8 @@ const parseFields = (body: Record<string, any>) => {
   });
 };
 
-export const getProperties = async (req: Request, res: Response) => {
-  try {
+export const getProperties = asyncHandler(
+  async (req: Request, res: Response) => {
     const { city, minPrice, maxPrice, bedrooms, bathrooms, type } = req.query;
 
     const query: Record<string, any> = {};
@@ -52,13 +53,11 @@ export const getProperties = async (req: Request, res: Response) => {
       "profile email",
     );
     res.json(properties);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getPropertyById = async (req: Request, res: Response) => {
-  try {
+export const getPropertyById = asyncHandler(
+  async (req: Request, res: Response) => {
     const property = await Property.findById(req.params.id).populate(
       "landlord",
       "profile email",
@@ -67,13 +66,11 @@ export const getPropertyById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
     res.json(property);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const createProperty = async (req: AuthRequest, res: Response) => {
-  try {
+export const createProperty = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     parseFields(req.body);
 
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
@@ -98,14 +95,11 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
     await deletePattern("cache:/api/properties*");
 
     res.status(201).json(property);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const updateProperty = async (req: AuthRequest, res: Response) => {
-  try {
+export const updateProperty = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     parseFields(req.body);
 
     let property = await Property.findById(req.params.id);
@@ -151,14 +145,11 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
     await deletePattern("cache:/api/properties*");
 
     res.json(property);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const deleteProperty = async (req: AuthRequest, res: Response) => {
-  try {
+export const deleteProperty = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const property = await Property.findById(req.params.id);
 
     if (!property) {
@@ -177,19 +168,12 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
     await deletePattern("cache:/api/properties*");
 
     res.json({ message: "Property removed" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
 
-export const getLandlordProperties = async (
-  req: AuthRequest,
-  res: Response,
-) => {
-  try {
+export const getLandlordProperties = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
     const properties = await Property.find({ landlord: req.params.userId });
     res.json(properties);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+  },
+);
