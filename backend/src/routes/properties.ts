@@ -13,14 +13,16 @@ import { UserRole } from "../types/index.js";
 
 const router = express.Router();
 
+import { cacheMiddleware } from "../middleware/cache.js";
+
 router
   .route("/")
-  .get(getProperties)
+  .get(cacheMiddleware(3600), getProperties)
   .post(protect, authorize(UserRole.LANDLORD), upload.any(), createProperty);
 
 router
   .route("/:id")
-  .get(getPropertyById)
+  .get(cacheMiddleware(3600), getPropertyById)
   .put(protect, authorize(UserRole.LANDLORD), upload.any(), updateProperty)
   .delete(protect, authorize(UserRole.LANDLORD), deleteProperty);
 

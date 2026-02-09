@@ -7,6 +7,8 @@ import {
 } from "../utils/auth.js";
 import { registerSchema, loginSchema } from "../validators/auth.js";
 
+
+
 export const register = async (req: Request, res: Response) => {
   try {
     const validation = registerSchema.safeParse(req.body);
@@ -57,7 +59,7 @@ export const login = async (req: Request, res: Response) => {
 
     const { email, password } = validation.data;
 
-    const user: any = await User.findOne({ email });
+    const user : any = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
       const accessToken = generateAccessToken(user._id.toString(), user.role);
       const refreshToken = generateRefreshToken(user._id.toString());

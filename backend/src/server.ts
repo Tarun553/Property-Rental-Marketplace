@@ -6,6 +6,9 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 
+import { connectRedis } from "./utils/redis.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
+
 dotenv.config();
 
 import connectDB from "./config/database.js";
@@ -19,6 +22,7 @@ import messageRoutes from "./routes/messages.js";
 import { socketHandler } from "./socket/socketHandler.js";
 
 connectDB();
+connectRedis();
 
 const app = express();
 const httpServer = createServer(app);
@@ -35,6 +39,7 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(globalLimiter);
 
 // Routes
 app.use("/api/auth", authRoutes);

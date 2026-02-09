@@ -6,6 +6,7 @@ import {
 } from "../validators/property.js";
 import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
+import { deletePattern } from "../utils/redis.js";
 
 // Helper to parse multipart fields
 const parseFields = (body: any) => {
@@ -27,7 +28,6 @@ const parseFields = (body: any) => {
     }
   });
 };
-
 
 export const getProperties = async (req: Request, res: Response) => {
   try {
@@ -57,7 +57,6 @@ export const getProperties = async (req: Request, res: Response) => {
   }
 };
 
-
 export const getPropertyById = async (req: Request, res: Response) => {
   try {
     const property = await Property.findById(req.params.id).populate(
@@ -72,7 +71,6 @@ export const getPropertyById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const createProperty = async (req: AuthRequest, res: Response) => {
   try {
@@ -96,13 +94,15 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
       landlord: req.user._id,
     });
 
+    // Invalidate caches
+    await deletePattern("cache:/api/properties*");
+
     res.status(201).json(property);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const updateProperty = async (req: AuthRequest, res: Response) => {
   try {
@@ -147,13 +147,15 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
       { new: true },
     );
 
+    // Invalidate caches
+    await deletePattern("cache:/api/properties*");
+
     res.json(property);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const deleteProperty = async (req: AuthRequest, res: Response) => {
   try {
@@ -171,12 +173,14 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
 
     await property.deleteOne();
 
+    // Invalidate caches
+    await deletePattern("cache:/api/properties*");
+
     res.json({ message: "Property removed" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const getLandlordProperties = async (
   req: AuthRequest,
