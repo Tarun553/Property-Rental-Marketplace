@@ -9,12 +9,15 @@ export const initSocket = (token: string): Socket => {
     return socket;
   }
 
-  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+  const SOCKET_URL =
+    process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
 
   socket = io(SOCKET_URL, {
     auth: {
       token,
     },
+    transports: ["websocket"], // Hard-force websocket to bypass cookie issues on mobile
+    upgrade: false,
     autoConnect: true,
     reconnection: true,
     reconnectionDelay: 1000,
