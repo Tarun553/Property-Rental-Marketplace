@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { verifyAccessToken } from "../utils/auth.js";
 import User from "../models/User.js";
 import MessageThread from "../models/Message.js";
+import { DecodedToken, IUser } from "../types/index.js";
 
 interface SocketUser {
   id: string;
@@ -15,8 +16,10 @@ export const socketHandler = (io: Server) => {
       const token = socket.handshake.auth.token;
       if (!token) return next(new Error("Authentication error: Token missing"));
 
-      const decoded: any = verifyAccessToken(token);
-      const user = await User.findById(decoded.id).select("-password");
+      const decoded = verifyAccessToken(token) as DecodedToken;
+      const user = (await User.findById(decoded.id).select(
+        "-password",
+      )) as IUser | null;
 
       if (!user) return next(new Error("Authentication error: User not found"));
 

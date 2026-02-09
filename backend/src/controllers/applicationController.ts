@@ -7,10 +7,10 @@ import {
 } from "../validators/application.js";
 import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
-import { ApplicationStatus } from "../types/index.js";
+import { ApplicationStatus, UserRole } from "../types/index.js";
 
 // Helper to parse multipart fields
-const parseFields = (body: any) => {
+const parseFields = (body: Record<string, any>) => {
   const fields = ["personalInfo", "references"];
   fields.forEach((field) => {
     if (typeof body[field] === "string") {
@@ -22,7 +22,6 @@ const parseFields = (body: any) => {
     }
   });
 };
-
 
 export const submitApplication = async (req: AuthRequest, res: Response) => {
   try {
@@ -41,7 +40,7 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
     // Check if tenant already applied
     const existingApplication = await Application.findOne({
       property: req.body.property,
-      tenant: req.user._id,
+      tenant: req.user?._id,
     });
 
     if (existingApplication) {
@@ -57,14 +56,14 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
       );
       documents = urls.map((url, index) => ({
         url,
-        type: "other", 
+        type: "other",
         name: (req.files as Express.Multer.File[])[index].originalname,
       }));
     }
 
     const application = await Application.create({
       ...validation.data,
-      tenant: req.user._id,
+      tenant: req.user?._id,
       landlord: property.landlord,
       documents,
       status: ApplicationStatus.PENDING,
@@ -77,7 +76,6 @@ export const submitApplication = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 export const getPropertyApplications = async (
   req: AuthRequest,
   res: Response,
@@ -88,7 +86,7 @@ export const getPropertyApplications = async (
       return res.status(404).json({ message: "Property not found" });
     }
 
-    if (property.landlord.toString() !== req.user._id.toString()) {
+    if (property.landlord.toString() !== req.user?._id.toString()) {
       return res.status(403).json({
         message: "Not authorized to view applications for this property",
       });
@@ -106,15 +104,18 @@ export const getPropertyApplications = async (
   }
 };
 
-
 export const getTenantApplications = async (
   req: AuthRequest,
   res: Response,
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (
       req.user._id.toString() !== req.params.userId &&
-      req.user.role !== "admin"
+      req.user.role !== UserRole.ADMIN
     ) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -128,7 +129,6 @@ export const getTenantApplications = async (
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const updateApplicationStatus = async (
   req: AuthRequest,
@@ -145,7 +145,7 @@ export const updateApplicationStatus = async (
       return res.status(404).json({ message: "Application not found" });
     }
 
-    if (application.landlord.toString() !== req.user._id.toString()) {
+    if (application.landlord.toString() !== req.user?._id.toString()) {
       return res
         .status(403)
         .json({ message: "Not authorized to update this application" });

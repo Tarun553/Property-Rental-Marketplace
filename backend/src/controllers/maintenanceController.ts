@@ -9,7 +9,6 @@ import { AuthRequest } from "../middleware/auth.js";
 import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { MaintenanceStatus } from "../types/index.js";
 
-
 export const createMaintenanceRequest = async (
   req: AuthRequest,
   res: Response,
@@ -30,6 +29,10 @@ export const createMaintenanceRequest = async (
       photos = await uploadMultipleToCloudinary(
         req.files as Express.Multer.File[],
       );
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     const maintenanceRequest = await MaintenanceRequest.create({
@@ -54,7 +57,6 @@ export const createMaintenanceRequest = async (
   }
 };
 
-
 export const getPropertyMaintenanceRequests = async (
   req: AuthRequest,
   res: Response,
@@ -63,6 +65,10 @@ export const getPropertyMaintenanceRequests = async (
     const property = await Property.findById(req.params.propertyId);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     if (property.landlord.toString() !== req.user._id.toString()) {
@@ -81,12 +87,15 @@ export const getPropertyMaintenanceRequests = async (
   }
 };
 
-
 export const getTenantMaintenanceRequests = async (
   req: AuthRequest,
   res: Response,
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (
       req.user._id.toString() !== req.params.userId &&
       req.user.role !== "admin"
@@ -106,7 +115,6 @@ export const getTenantMaintenanceRequests = async (
   }
 };
 
-
 export const updateMaintenanceStatus = async (
   req: AuthRequest,
   res: Response,
@@ -120,6 +128,10 @@ export const updateMaintenanceStatus = async (
     const maintenanceRequest = await MaintenanceRequest.findById(req.params.id);
     if (!maintenanceRequest) {
       return res.status(404).json({ message: "Maintenance request not found" });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     if (maintenanceRequest.landlord.toString() !== req.user._id.toString()) {

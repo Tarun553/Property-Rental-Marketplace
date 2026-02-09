@@ -8,11 +8,18 @@ const redisClient = createClient({
 });
 
 redisClient.on("error", (err) => console.error("Redis Client Error", err));
+redisClient.on("connect", () => console.log("Redis Client Connecting..."));
+redisClient.on("ready", () => console.log("Redis Client Ready"));
+redisClient.on("end", () => console.log("Redis Client Disconnected"));
 
 const connectRedis = async () => {
   if (!redisClient.isOpen) {
-    await redisClient.connect();
-    console.log("Redis connected successfully");
+    try {
+      console.log("Attempting to connect to Redis...");
+      await redisClient.connect();
+    } catch (error) {
+      console.error("Failed to connect to Redis:", error);
+    }
   }
 };
 
@@ -33,7 +40,7 @@ export const getCache = async (key: string) => {
 
 export const setCache = async (
   key: string,
-  value: any,
+  value: unknown,
   ttlSeconds: number = 3600,
 ) => {
   try {

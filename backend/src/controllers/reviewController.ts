@@ -30,6 +30,10 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     }
 
     // Check if reviewer is not reviewing themselves
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (req.user._id.toString() === reviewee) {
       return res.status(400).json({ message: "You cannot review yourself" });
     }
@@ -131,6 +135,10 @@ export const getUserReviews = async (req: Request, res: Response) => {
 export const getReviewsByReviewer = async (req: AuthRequest, res: Response) => {
   try {
     // Only allow users to see their own written reviews
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (req.user._id.toString() !== req.params.userId) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -158,6 +166,10 @@ export const respondToReview = async (req: AuthRequest, res: Response) => {
     }
 
     // Check if the current user is the reviewee
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (review.reviewee.toString() !== req.user._id.toString()) {
       return res
         .status(403)

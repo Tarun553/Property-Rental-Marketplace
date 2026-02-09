@@ -17,6 +17,10 @@ export const createLease = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (property.landlord.toString() !== req.user._id.toString()) {
       return res
         .status(403)
@@ -47,6 +51,10 @@ export const getLeaseById = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Lease not found" });
     }
 
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     const isLandlord =
       lease.landlord._id.toString() === req.user._id.toString();
     const isTenant = lease.tenant._id.toString() === req.user._id.toString();
@@ -73,6 +81,10 @@ export const signLease = async (req: AuthRequest, res: Response) => {
     const lease = await Lease.findById(req.params.id);
     if (!lease) {
       return res.status(404).json({ message: "Lease not found" });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     const isLandlord = lease.landlord.toString() === req.user._id.toString();
@@ -125,6 +137,10 @@ export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     if (property.landlord.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -141,6 +157,10 @@ export const getPropertyLeases = async (req: AuthRequest, res: Response) => {
 
 export const getTenantLeases = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
     // Only allow tenants to view their own leases
     if (req.user._id.toString() !== req.params.tenantId) {
       return res.status(403).json({ message: "Not authorized" });

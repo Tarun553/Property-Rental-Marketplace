@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../utils/auth.js";
 import User from "../models/User.js";
 
+import { IUser, DecodedToken } from "../types/index.js";
+
 export interface AuthRequest extends Request {
-  user?: any;
+  user?: IUser | null;
 }
 
 export const protect = async (
@@ -19,9 +21,11 @@ export const protect = async (
   ) {
     try {
       token = req.headers.authorization.split(" ")[1];
-      const decoded: any = verifyAccessToken(token);
+      const decoded = verifyAccessToken(token) as DecodedToken;
 
-      req.user = await User.findById(decoded.id).select("-password");
+      req.user = (await User.findById(decoded.id).select(
+        "-password",
+      )) as IUser | null;
 
       if (!req.user) {
         return res

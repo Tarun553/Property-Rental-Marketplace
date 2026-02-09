@@ -9,7 +9,7 @@ import { uploadMultipleToCloudinary } from "../utils/cloudinaryUpload.js";
 import { deletePattern } from "../utils/redis.js";
 
 // Helper to parse multipart fields
-const parseFields = (body: any) => {
+const parseFields = (body: Record<string, any>) => {
   const fields = [
     "address",
     "pricing",
@@ -33,7 +33,7 @@ export const getProperties = async (req: Request, res: Response) => {
   try {
     const { city, minPrice, maxPrice, bedrooms, bathrooms, type } = req.query;
 
-    const query: any = {};
+    const query: Record<string, any> = {};
 
     if (city) query["address.city"] = { $regex: city, $options: "i" };
     if (minPrice || maxPrice) {
@@ -91,7 +91,7 @@ export const createProperty = async (req: AuthRequest, res: Response) => {
 
     const property = await Property.create({
       ...validation.data,
-      landlord: req.user._id,
+      landlord: req.user!._id,
     });
 
     // Invalidate caches
@@ -114,7 +114,7 @@ export const updateProperty = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    if (property.landlord.toString() !== req.user._id.toString()) {
+    if (property.landlord.toString() !== req.user!._id.toString()) {
       return res
         .status(403)
         .json({ message: "Not authorized to update this property" });
@@ -165,7 +165,7 @@ export const deleteProperty = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    if (property.landlord.toString() !== req.user._id.toString()) {
+    if (property.landlord.toString() !== req.user!._id.toString()) {
       return res
         .status(403)
         .json({ message: "Not authorized to delete this property" });

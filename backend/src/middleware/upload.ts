@@ -1,10 +1,15 @@
 import multer from "multer";
+import { Request } from "express";
 import path from "path";
 
 // Memory storage to avoid saving files locally, we will upload to Cloudinary directly from buffer
 const storage = multer.memoryStorage();
 
-const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
+const fileFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback,
+) => {
   const filetypes = /jpeg|jpg|png|webp/;
   const mimetype = filetypes.test(file.mimetype);
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());

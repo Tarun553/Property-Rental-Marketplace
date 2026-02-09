@@ -13,6 +13,9 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
     }
 
     const { recipientId, propertyId, message } = validation.data;
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
     const senderId = req.user._id;
 
     if (!recipientId) {
@@ -85,6 +88,9 @@ export const startConversation = async (req: AuthRequest, res: Response) => {
 
 export const getUserThreads = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
     const threads = await MessageThread.find({
       participants: req.user._id,
     })
@@ -103,6 +109,9 @@ export const getConversationHistory = async (
   res: Response,
 ) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
     const thread = await MessageThread.findOne({
       conversationId: req.params.conversationId,
       participants: req.user._id,
@@ -122,6 +131,9 @@ export const getConversationHistory = async (
 
 export const markAsRead = async (req: AuthRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
     const thread = await MessageThread.findOne({
       conversationId: req.params.conversationId,
       participants: req.user._id,
@@ -131,9 +143,10 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Conversation not found" });
     }
 
+    const currentUserId = req.user._id.toString();
     // Mark all messages as read that were sent by others
     thread.messages.forEach((msg) => {
-      if (msg.sender.toString() !== req.user._id.toString()) {
+      if (msg.sender.toString() !== currentUserId) {
         msg.read = true;
       }
     });

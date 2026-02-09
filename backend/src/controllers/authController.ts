@@ -1,13 +1,12 @@
 import { Request, Response } from "express";
 import User from "../models/User.js";
+import { IUser, DecodedToken } from "../types/index.js";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/auth.js";
 import { registerSchema, loginSchema } from "../validators/auth.js";
-
-
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -59,7 +58,7 @@ export const login = async (req: Request, res: Response) => {
 
     const { email, password } = validation.data;
 
-    const user : any = await User.findOne({ email });
+    const user = (await User.findOne({ email })) as IUser | null;
     if (user && (await user.matchPassword(password))) {
       const accessToken = generateAccessToken(user._id.toString(), user.role);
       const refreshToken = generateRefreshToken(user._id.toString());
@@ -90,8 +89,8 @@ export const refresh = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Refresh token is required" });
     }
 
-    const decoded: any = verifyRefreshToken(refreshToken);
-    const user = await User.findById(decoded.id);
+    const decoded = verifyRefreshToken(refreshToken) as DecodedToken;
+    const user = (await User.findById(decoded.id)) as IUser | null;
 
     if (!user || user.refreshToken !== refreshToken) {
       return res.status(401).json({ message: "Invalid refresh token" });

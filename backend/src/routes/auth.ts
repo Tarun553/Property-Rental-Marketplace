@@ -5,7 +5,7 @@ import {
   refresh,
   logout,
 } from "../controllers/authController.js";
-import { protect } from "../middleware/auth.js";
+import { protect, AuthRequest } from "../middleware/auth.js";
 
 import { authLimiter } from "../middleware/rateLimiter.js";
 
@@ -17,7 +17,7 @@ router.post("/refresh", refresh);
 router.post("/logout", logout);
 
 // Example protected route
-router.get("/me", protect, (req: any, res) => {
+router.get("/me", protect, (req: AuthRequest, res) => {
   res.json(req.user);
 });
 
