@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/lib/providers";
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -77,6 +78,7 @@ export default function RootLayout({
         <Providers>
           <div className="relative min-h-screen flex flex-col">
             {children}
+             <Analytics />
           </div>
           <Toaster
             position="bottom-right"
