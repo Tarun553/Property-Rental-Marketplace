@@ -26,10 +26,10 @@ import {
   Bed,
   Bath,
   Square,
-  DollarSign,
+  
   Check,
   X,
-  Loader2,
+  
   ArrowLeft,
   MessageSquare,
   Heart,
@@ -181,7 +181,7 @@ export default function PropertyDetailPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/30">
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
@@ -229,7 +229,7 @@ export default function PropertyDetailPage() {
                       priority
                     />
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
                     {/* Navigation Arrows */}
                     {property.media.photos.length > 1 && (

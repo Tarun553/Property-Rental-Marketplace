@@ -9,32 +9,27 @@ import { useTenantMaintenance } from "@/hooks/useMaintenance";
 import { LeaseCard } from "@/components/lease/LeaseCard";
 import { MaintenanceCard } from "@/components/maintenance/MaintenanceCard";
 import { MaintenanceRequestForm } from "@/components/maintenance/MaintenanceRequestForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import {
-  Loader2,
-  MapPin,
-  Calendar,
-  DollarSign,
   FileText,
-  Home,
-  CheckCircle2,
   Clock,
   XCircle,
   Search,
   MessageSquare,
   Wrench,
-  ClipboardList,
-  ArrowUpRight,
-  Sparkles,
-  Eye,
-  Building2,
   AlertCircle,
   User,
+  ClipboardList,
+  CheckCircle2,
+  ArrowUpRight,
+  MapPin,
+  DollarSign,
+  Calendar,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -222,7 +217,7 @@ export default function TenantDashboard() {
 
   return (
     <ProtectedRoute allowedRoles={["tenant"]}>
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <div className="min-h-screen bg-linear-to-b from-background to-muted/30">
         <Navbar />
 
         <div className="container mx-auto px-4 py-8">

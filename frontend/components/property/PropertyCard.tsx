@@ -53,7 +53,7 @@ export function PropertyCard({ property, variant = "default" }: PropertyCardProp
       <Link href={`/properties/${property._id}`}>
         <Card className="group overflow-hidden border-0 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:shadow-lg">
           <div className="flex gap-4 p-3">
-            <div className="relative h-20 w-28 flex-shrink-0 rounded-lg overflow-hidden">
+            <div className="relative h-20 w-28 shrink-0 rounded-lg overflow-hidden">
               <Image
                 src={imageError ? "/placeholder-property.jpg" : mainPhoto}
                 alt={property.title}

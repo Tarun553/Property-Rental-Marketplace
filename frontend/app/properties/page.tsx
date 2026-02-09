@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Navbar } from "@/components/layout/Navbar";
 import { PropertyCard } from "@/components/property/PropertyCard";
@@ -9,7 +9,7 @@ import { useProperties } from "@/hooks/useProperties";
 import { PropertyFilters as PropertyFiltersType } from "@/types/property";
 import {
   Loader2,
-  Grid3x3,
+  
   Map as MapIcon,
   LayoutGrid,
   List,
@@ -96,7 +96,7 @@ export default function PropertiesPage() {
 
       <div className="container mx-auto px-4 -mt-6">
         {/* Controls Bar */}
-        <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-4 mb-6 sticky top-20 z-30 backdrop-blur-sm bg-card/95">
+        <div className="bg-card/95 rounded-2xl shadow-lg border border-border/50 p-4 mb-6 sticky top-20 z-30 backdrop-blur-sm bg-card/95">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Left Side - Results & Mobile Filter */}
             <div className="flex items-center gap-3 w-full sm:w-auto">

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,12 +11,12 @@ import {
   MessageSquare,
   FileText,
   Home,
-  Users,
+  
   ArrowRight,
   CheckCircle2,
   Sparkles,
   Building2,
-  MapPin,
+  
   Star,
   TrendingUp,
   Zap,
@@ -101,7 +100,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-radial" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px]" />
 
         <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="max-w-4xl mx-auto text-center">
@@ -227,7 +226,7 @@ export default function HomePage() {
                 <div key={index} className="relative text-center group">
                   {/* Connector line */}
                   {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 left-[60%] w-full h-px bg-gradient-to-r from-primary/50 to-transparent" />
+                    <div className="hidden lg:block absolute top-8 left-[60%] w-full h-px bg-linear-to-r from-primary/50 to-transparent" />
                   )}
 
                   <div className="relative inline-flex items-center justify-center mb-6">
@@ -300,7 +299,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative max-w-4xl mx-auto text-center">
             {/* Background decoration */}
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl" />
+            <div className="absolute inset-0 bg-linear-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl" />
 
             <div className="relative bg-card border rounded-3xl p-8 md:p-16 shadow-xl">
               <Badge variant="secondary" className="mb-6">
